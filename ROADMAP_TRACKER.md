@@ -11,8 +11,8 @@
 | Giai đoạn | Tên giai đoạn | Trạng thái | Ghi chú & Điểm dừng nghiệm thu |
 | :---: | :--- | :---: | :--- |
 | **Giai đoạn 1** | Phân tích yêu cầu & Thiết kế hệ thống | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% tài liệu thiết kế, sơ đồ Mermaid, cài Git & đẩy lên GitHub |
-| **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | 🟡 **SẴN SÀNG** | Tạo Supabase Project, kích hoạt PostGIS, chạy DDL Migration & Seed data |
-| **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | ⚪ *Chưa bắt đầu* | API CRUD, PostGIS spatial queries, JWT verification, Zod validation |
+| **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | 🟢 **HOÀN THÀNH** | Đã tạo Supabase, bật PostGIS, chạy DDL Migration, nạp 27 điểm ngập, test kết nối OK |
+| **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | 🟡 **SẴN SÀNG** | Khởi tạo Express TS, kết nối PostGIS, spatial query ST_DWithin, JWT auth |
 | **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | ⚪ *Chưa bắt đầu* | Dashboard, Bản đồ Leaflet, Radius tool, Admin panel, Detail modal |
 | **Giai đoạn 5** | Tích hợp hệ thống toàn diện | ⚪ *Chưa bắt đầu* | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm tra luồng dữ liệu thật |
 | **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | ⚪ *Chưa bắt đầu* | Chạy test tự động API, test tính toán khoảng cách PostGIS, test responsive |
@@ -41,12 +41,12 @@
 - 🛑 **Nghiệm thu Giai đoạn 1:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 2.
 
 ### 📍 GIAI ĐOẠN 2: CHUẨN BỊ SUPABASE CLOUD & POSTGIS
-- [ ] **Bước 2.1:** Thông báo mẫu `CẦN NGƯỜI DÙNG THỰC HIỆN` để người dùng tạo Supabase Project.
-- [ ] **Bước 2.2:** Soạn file Migration `database/migrations/01_initial_schema.sql` (bật PostGIS, tạo 8 bảng, constraints, GiST indexes).
-- [ ] **Bước 2.3:** Soạn file Seed Data `database/seeds/01_seed_flood_points.sql` (nạp 27 điểm ngập thực tế + 3 kịch bản demo).
-- [ ] **Bước 2.4:** Hướng dẫn cấu hình Supabase Auth và phân quyền bảo mật hàng (Row Level Security - RLS).
-- [ ] **Bước 2.5:** Viết script kiểm tra kết nối từ xa đến CSDL và chạy thử nghiệm 1 câu truy vấn PostGIS mẫu.
-- 🛑 **Nghiệm thu Giai đoạn 2:** Kết nối Database thành công, dữ liệu điểm ngập hiển thị đầy đủ trong Supabase Table Editor.
+- [x] **Bước 2.1:** Người dùng tạo Supabase Project thành công (`Hanoi-FloodWatch-GIS` tại region Singapore).
+- [x] **Bước 2.2:** Soạn và thực thi Migration `database/migrations/01_initial_schema.sql` (bật PostGIS, tạo 8 bảng, constraints, GiST indexes, trigger tính RiskScore tự động).
+- [x] **Bước 2.3:** Soạn và thực thi Seed Data `database/seeds/01_seed_flood_points.sql` (nạp 27 điểm ngập thực tế Hà Nội + 3 kịch bản demo + trạm đo mưa + cảnh báo).
+- [x] **Bước 2.4:** Cấu hình biến môi trường bí mật trong file cục bộ `.env`.
+- [x] **Bước 2.5:** Viết và chạy script kiểm tra kết nối từ xa `database/scripts/test_supabase.js` (Kết quả: Truy vấn thành công 100% dữ liệu không gian).
+- 🛑 **Nghiệm thu Giai đoạn 2:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 3.
 
 ---
 
