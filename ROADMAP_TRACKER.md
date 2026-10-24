@@ -13,8 +13,8 @@
 | **Giai đoạn 1** | Phân tích yêu cầu & Thiết kế hệ thống | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% tài liệu thiết kế, sơ đồ Mermaid, cài Git & đẩy lên GitHub |
 | **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | 🟢 **HOÀN THÀNH** | Đã tạo Supabase, bật PostGIS, chạy DDL Migration, nạp 27 điểm ngập, test kết nối OK |
 | **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | 🟢 **HOÀN THÀNH** | Đã hoàn thành toàn bộ API, PostGIS spatial queries, Zod, JWT Auth, 9/9 tests pass |
-| **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | 🟡 **SẴN SÀNG** | Khởi tạo React Vite, Tailwind, Leaflet, Radius Tool, Dashboard, Admin |
-| **Giai đoạn 5** | Tích hợp hệ thống toàn diện | ⚪ *Chưa bắt đầu* | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm tra luồng dữ liệu thật |
+| **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% UI: Leaflet Map, Radius Tool, Dashboard, Admin, Build Vite OK |
+| **Giai đoạn 5** | Tích hợp hệ thống toàn diện | 🟡 **SẴN SÀNG** | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm tra luồng dữ liệu thật |
 | **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | ⚪ *Chưa bắt đầu* | Chạy test tự động API, test tính toán khoảng cách PostGIS, test responsive |
 | **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | ⚪ *Chưa bắt đầu* | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS |
 | **Giai đoạn 8** | Hoàn thiện Báo cáo Đồ án & Slide Bảo vệ | ⚪ *Chưa bắt đầu* | Báo cáo 5 chương tiếng Việt, Slide 15-20 trang, Kịch bản demo hội đồng |
@@ -71,18 +71,18 @@
 ---
 
 ### 📍 GIAI ĐOẠN 4: XÂY DỰNG FRONTEND WEBGIS (REACT + VITE + TAILWIND + LEAFLET)
-- [ ] **Bước 4.1:** Khởi tạo dự án Vite + React + TypeScript + Tailwind CSS + Lucide Icons + React Router.
-- [ ] **Bước 4.2:** Xây dựng Bản đồ trung tâm Leaflet & Custom Markers phân màu theo mức nguy cơ (Đỏ/Cam/Xanh lá/Xám) kèm Popup.
-- [ ] **Bước 4.3:** Xây dựng Sidebar điều khiển GIS:
+- [x] **Bước 4.1:** Khởi tạo dự án Vite + React + TypeScript + Tailwind CSS + Lucide Icons + React Router.
+- [x] **Bước 4.2:** Xây dựng Bản đồ trung tâm Leaflet & Custom Markers phân màu theo mức nguy cơ (Đỏ/Cam/Xanh lá/Xám) kèm Popup.
+- [x] **Bước 4.3:** Xây dựng Sidebar điều khiển GIS:
   - Thanh tìm kiếm địa điểm, bộ lọc theo Quận và Mức nguy cơ.
   - Công cụ quét bán kính: Chọn tâm trực tiếp trên map, chọn bán kính 500m - 5km, vẽ đường tròn bán kính (Circle), hiển thị danh sách kết quả.
-- [ ] **Bước 4.4:** Xây dựng Dashboard giám sát: Thẻ KPI, biểu đồ phân bố Recharts, bản tin cảnh báo chạy chữ.
-- [ ] **Bước 4.5:** Xây dựng Modal / Trang chi tiết điểm ngập: Lịch sử quan trắc, biểu đồ độ sâu, nguồn kiểm chứng.
-- [ ] **Bước 4.6:** Xây dựng Phân hệ Quản trị (Admin Panel):
+- [x] **Bước 4.4:** Xây dựng Dashboard giám sát: Thẻ KPI, biểu đồ phân bố Recharts, bản tin cảnh báo chạy chữ.
+- [x] **Bước 4.5:** Xây dựng Modal / Trang chi tiết điểm ngập: Lịch sử quan trắc, biểu đồ độ sâu, nguồn kiểm chứng.
+- [x] **Bước 4.6:** Xây dựng Phân hệ Quản trị (Admin Panel):
   - Form thêm/sửa điểm ngập có tính năng Click chọn tọa độ trực tiếp trên bản đồ (Pinpoint).
   - Quản lý cảnh báo và xuất/nhập GeoJSON.
-- [ ] **Bước 4.7:** Tối ưu hóa UI/UX: Loading skeleton, Empty states, Toast notifications, Responsive trên điện thoại.
-- 🛑 **Nghiệm thu Giai đoạn 4:** Giao diện chạy mượt mà trên trình duyệt máy tính và di động ở môi trường dev.
+- [x] **Bước 4.7:** Tối ưu hóa UI/UX: Loading skeleton, Empty states, Toast notifications, Responsive trên điện thoại, `vite build` 100% không lỗi.
+- 🛑 **Nghiệm thu Giai đoạn 4:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 5.
 
 ---
 
