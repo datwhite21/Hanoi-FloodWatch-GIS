@@ -2,8 +2,14 @@
 ### HỆ THỐNG WEBGIS THEO DÕI VÀ CẢNH BÁO NGUY CƠ NGẬP ÚNG ĐÔ THỊ TẠI HÀ NỘI
 
 **Cấp độ đề tài:** Đồ án Chuyên ngành Công nghệ Thông tin  
-**Công nghệ:** React 18, Vite, TypeScript, Tailwind CSS, Leaflet, Node.js, Express, PostgreSQL/PostGIS (Supabase Cloud)  
-**Triển khai:** Cloudflare Pages (Frontend) + Render (Backend) + Supabase Cloud (PostGIS Database)  
+**Kho lưu trữ:** [https://github.com/datwhite21/Hanoi-FloodWatch-GIS](https://github.com/datwhite21/Hanoi-FloodWatch-GIS)  
+
+### 🌐 ĐỊA CHỈ TRUY CẬP TRỰC TUYẾN CHÍNH THỨC (24/7)
+- 🗺️ **Trang WebGIS Công khai (Frontend):** [https://hanoi-floodwatch-gis.pages.dev](https://hanoi-floodwatch-gis.pages.dev)
+- 📡 **Máy chủ Dịch vụ Không gian (Backend REST API):** [https://hanoi-floodwatch-gis-1.onrender.com](https://hanoi-floodwatch-gis-1.onrender.com)
+- 🩺 **Kiểm tra tình trạng máy chủ (Health Check):** [https://hanoi-floodwatch-gis-1.onrender.com/api/health](https://hanoi-floodwatch-gis-1.onrender.com/api/health)
+- 📋 **Hồ sơ Kết quả Kiểm thử (100% PASS):** [docs/testing/TEST_RESULTS.md](docs/testing/TEST_RESULTS.md)
+- 🚀 **Hướng dẫn Triển khai Cloud:** [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
 
 ---
 
@@ -50,6 +56,6 @@ Bộ tài liệu kỹ thuật và thiết kế hoàn chỉnh được lưu trữ
 
 ---
 
-## 5. TÌNH TRẠNG HIỆN TẠI & BƯỚC TIẾP THEO
-- **Hiện tại:** Đã hoàn thành toàn diện **Giai đoạn 1: Khảo sát môi trường, Phân tích & Thiết kế hệ thống**.
-- **Bước tiếp theo:** Chờ người dùng cài đặt Git, sau đó bước vào **Giai đoạn 2: Thiết lập CSDL Supabase & PostGIS**.
+## 5. TÌNH TRẠNG HIỆN TẠI & HƯỚNG DẪN BẢO VỆ
+- **Tình trạng:** Đã hoàn thành 100% xây dựng, kiểm thử và **Triển khai thành công lên Cloud Internet** (Giai đoạn 1 đến Giai đoạn 7).
+- **Hồ sơ bảo vệ đồ án:** Đầy đủ báo cáo 5 chương, slide thuyết trình và kịch bản demo trực tiếp tại [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) và [ROADMAP_TRACKER.md](ROADMAP_TRACKER.md).

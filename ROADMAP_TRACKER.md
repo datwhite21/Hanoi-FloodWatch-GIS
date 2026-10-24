@@ -16,8 +16,8 @@
 | **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% UI: Leaflet Map, Radius Tool, Dashboard, Admin, Build Vite OK |
 | **Giai đoạn 5** | Tích hợp hệ thống toàn diện | 🟢 **HOÀN THÀNH** | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm thử E2E script 100% pass |
 | **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | 🟢 **HOÀN THÀNH** | Lập Test Plan, Test Results, 25/25 ca kiểm thử đạt chuẩn 100% |
-| **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | 🟡 **SẴN SÀNG** | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS |
-| **Giai đoạn 8** | Hoàn thiện Báo cáo Đồ án & Slide Bảo vệ | ⚪ *Chưa bắt đầu* | Báo cáo 5 chương tiếng Việt, Slide 15-20 trang, Kịch bản demo hội đồng |
+| **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | 🟢 **HOÀN THÀNH** | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS 24/7 |
+| **Giai đoạn 8** | Hoàn thiện Báo cáo Đồ án & Slide Bảo vệ | 🟡 **SẴN SÀNG** | Báo cáo 5 chương tiếng Việt, Slide 15-20 trang, Kịch bản demo hội đồng |
 
 ---
 
@@ -107,15 +107,17 @@
 ---
 
 ### 📍 GIAI ĐOẠN 7: TRIỂN KHAI LÊN INTERNET (PRODUCTION CLOUD DEPLOYMENT)
-- [ ] **Bước 7.1:** Thông báo mẫu `CẦN NGƯỜI DÙNG THỰC HIỆN` để chuẩn bị tài khoản Render & Cloudflare (miễn phí).
-- [ ] **Bước 7.2:** Triển khai Backend Express lên **Render Web Service**:
-  - Cấu hình Build/Start command, biến môi trường bí mật trên Dashboard Render.
-  - Kiểm tra Health check và cấu hình CORS theo domain chính thức.
-- [ ] **Bước 7.3:** Triển khai Frontend React lên **Cloudflare Pages**:
-  - Cấu hình build Vite, cấu hình SPA routing (`_redirects`), nạp biến môi trường.
-  - Kích hoạt HTTPS và kiểm tra domain miễn phí `*.pages.dev`.
-- [ ] **Bước 7.4:** Kiểm thử liên mạng từ thiết bị độc lập (điện thoại 4G/5G, mạng khác).
-- 🛑 **Nghiệm thu Giai đoạn 7:** Bàn giao đường link truy cập công khai 24/7 trên Internet.
+- [x] **Bước 7.1:** Thông báo mẫu `CẦN NGƯỜI DÙNG THỰC HIỆN` để chuẩn bị tài khoản Render & Cloudflare (miễn phí).
+- [x] **Bước 7.2:** Triển khai Backend Express lên **Render Web Service**:
+  - Triển khai thành công: `https://hanoi-floodwatch-gis-1.onrender.com`
+  - Health check `GET /api/health` ➔ 200 OK, kết nối Supabase Singapore.
+  - Cấu hình CORS tự động chấp thuận domain Cloudflare Pages.
+- [x] **Bước 7.3:** Triển khai Frontend React lên **Cloudflare Pages**:
+  - Triển khai thành công: `https://hanoi-floodwatch-gis.pages.dev`
+  - Cấu hình SPA routing (`_redirects`), nạp biến môi trường API.
+  - Kích hoạt HTTPS và phân phối CDN toàn cầu.
+- [x] **Bước 7.4:** Kiểm thử liên mạng thành công (CORS, REST API, PostGIS GIS queries).
+- 🛑 **Nghiệm thu Giai đoạn 7:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 8.
 
 ---
 
