@@ -96,11 +96,38 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       zoomControl: false,
     });
 
-    // Bản đồ nền OpenStreetMap qua HTTPS
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    // 1. Bản đồ nền Đô thị CartoDB Voyager (Tốc độ cao, không bị chặn DNS tại Việt Nam)
+    const voyagerLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    });
+
+    // 2. Bản đồ nền Vệ tinh Esri World Imagery
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+      maxZoom: 18,
+    });
+
+    // 3. Bản đồ OpenStreetMap chuẩn
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 19,
-    }).addTo(map);
+    });
+
+    // Thêm lớp mặc định
+    voyagerLayer.addTo(map);
+
+    // Bộ chọn lớp bản đồ nền (Base Layers Control)
+    L.control.layers(
+      {
+        '🗺️ Bản đồ Đô thị': voyagerLayer,
+        '🛰️ Ảnh Vệ tinh': satelliteLayer,
+        '📍 Bản đồ OSM': osmLayer,
+      },
+      undefined,
+      { position: 'topright' }
+    ).addTo(map);
 
     // Zoom control ở góc dưới bên phải
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -119,7 +146,20 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     markersLayerRef.current = markersLayer;
     mapInstanceRef.current = map;
 
+    // Cập nhật lại kích thước bản đồ sau khi container hiển thị
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapInstanceRef.current = null;
     };
