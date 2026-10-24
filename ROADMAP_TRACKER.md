@@ -10,8 +10,8 @@
 
 | Giai đoạn | Tên giai đoạn | Trạng thái | Ghi chú & Điểm dừng nghiệm thu |
 | :---: | :--- | :---: | :--- |
-| **Giai đoạn 1** | Phân tích yêu cầu & Thiết kế hệ thống | 🟡 **ĐANG HOÀN TẤT** | Đã tạo xong toàn bộ tài liệu thiết kế; Đang chờ người dùng cài Git |
-| **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | ⚪ *Chưa bắt đầu* | Cần tài khoản Supabase, kích hoạt PostGIS, chạy DDL Migration & Seed data |
+| **Giai đoạn 1** | Phân tích yêu cầu & Thiết kế hệ thống | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% tài liệu thiết kế, sơ đồ Mermaid, cài Git & đẩy lên GitHub |
+| **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | 🟡 **SẴN SÀNG** | Tạo Supabase Project, kích hoạt PostGIS, chạy DDL Migration & Seed data |
 | **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | ⚪ *Chưa bắt đầu* | API CRUD, PostGIS spatial queries, JWT verification, Zod validation |
 | **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | ⚪ *Chưa bắt đầu* | Dashboard, Bản đồ Leaflet, Radius tool, Admin panel, Detail modal |
 | **Giai đoạn 5** | Tích hợp hệ thống toàn diện | ⚪ *Chưa bắt đầu* | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm tra luồng dữ liệu thật |
@@ -37,8 +37,8 @@
   - [x] `.env.example` & `.gitignore` & `README.md`.
 - [x] **Bước 1.3:** Người dùng cài đặt xong Git for Windows theo hướng dẫn (Đã xác minh: `git version 2.56.0.windows.3`, user: `datwhite21`).
 - [x] **Bước 1.4:** Khởi tạo local Git repository và commit ban đầu toàn bộ tài liệu thiết kế.
-
----
+- [x] **Bước 1.5:** Liên kết remote origin và đẩy code thành công lên GitHub: `https://github.com/datwhite21/Hanoi-FloodWatch-GIS`.
+- 🛑 **Nghiệm thu Giai đoạn 1:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 2.
 
 ### 📍 GIAI ĐOẠN 2: CHUẨN BỊ SUPABASE CLOUD & POSTGIS
 - [ ] **Bước 2.1:** Thông báo mẫu `CẦN NGƯỜI DÙNG THỰC HIỆN` để người dùng tạo Supabase Project.
