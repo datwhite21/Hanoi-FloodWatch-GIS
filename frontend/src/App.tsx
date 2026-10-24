@@ -10,6 +10,8 @@ import { AdminPage } from './pages/AdminPage';
 import { LoginPage } from './pages/LoginPage';
 import { api } from './services/api';
 
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+
 const AppLayout: React.FC = () => {
   const location = useLocation();
   const [activeAlertCount, setActiveAlertCount] = useState(0);
@@ -43,11 +45,13 @@ const AppLayout: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppLayout />
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppLayout />
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

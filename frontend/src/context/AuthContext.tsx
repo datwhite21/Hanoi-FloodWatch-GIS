@@ -42,28 +42,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
+    let isMounted = true;
+    let subscription: any = null;
+
     // 1. Kiểm tra session hiện tại khi tải trang
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setToken(session.access_token);
-        fetchProfile(session.user.id, session.user.email);
-      }
+    try {
+      supabase.auth
+        .getSession()
+        .then((res) => {
+          if (!isMounted) return;
+          if (res?.data?.session) {
+            setToken(res.data.session.access_token);
+            fetchProfile(res.data.session.user.id, res.data.session.user.email);
+          }
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.warn('Supabase getSession non-fatal error:', err);
+          if (isMounted) setIsLoading(false);
+        });
+    } catch (e) {
+      console.warn('Supabase getSession exception:', e);
       setIsLoading(false);
-    });
+    }
 
     // 2. Lắng nghe thay đổi trạng thái đăng nhập
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setToken(session.access_token);
-        fetchProfile(session.user.id, session.user.email);
-      } else {
-        setToken(null);
-        setUser(null);
-      }
-      setIsLoading(false);
-    });
+    try {
+      const authListener = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!isMounted) return;
+        if (session) {
+          setToken(session.access_token);
+          fetchProfile(session.user.id, session.user.email);
+        } else {
+          setToken(null);
+          setUser(null);
+        }
+        setIsLoading(false);
+      });
+      subscription = authListener?.data?.subscription;
+    } catch (e) {
+      console.warn('onAuthStateChange exception:', e);
+    }
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      try {
+        subscription?.unsubscribe?.();
+      } catch {}
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
