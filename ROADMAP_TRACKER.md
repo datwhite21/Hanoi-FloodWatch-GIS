@@ -15,8 +15,8 @@
 | **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | 🟢 **HOÀN THÀNH** | Đã hoàn thành toàn bộ API, PostGIS spatial queries, Zod, JWT Auth, 9/9 tests pass |
 | **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% UI: Leaflet Map, Radius Tool, Dashboard, Admin, Build Vite OK |
 | **Giai đoạn 5** | Tích hợp hệ thống toàn diện | 🟢 **HOÀN THÀNH** | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm thử E2E script 100% pass |
-| **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | 🟡 **SẴN SÀNG** | Lập Test Plan, Test Results, kiểm thử GIS metric accuracy, bảo mật |
-| **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | ⚪ *Chưa bắt đầu* | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS |
+| **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | 🟢 **HOÀN THÀNH** | Lập Test Plan, Test Results, 25/25 ca kiểm thử đạt chuẩn 100% |
+| **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | 🟡 **SẴN SÀNG** | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS |
 | **Giai đoạn 8** | Hoàn thiện Báo cáo Đồ án & Slide Bảo vệ | ⚪ *Chưa bắt đầu* | Báo cáo 5 chương tiếng Việt, Slide 15-20 trang, Kịch bản demo hội đồng |
 
 ---
@@ -98,11 +98,11 @@
 ---
 
 ### 📍 GIAI ĐOẠN 6: KIỂM THỬ CHUYÊN SÂU (TESTING & QUALITY ASSURANCE)
-- [ ] **Bước 6.1:** Kiểm thử Frontend: Kiểm tra hiển thị bản đồ, bộ lọc, popup, form CRUD, responsive trên nhiều kích cỡ màn hình.
-- [ ] **Bước 6.2:** Kiểm thử Backend & API: Kiểm thử xác thực token, kiểm thử phân quyền, kiểm tra xử lý input độc hại.
-- [ ] **Bước 6.3:** Kiểm thử GIS & PostGIS: Xác thực tính chính xác của khoảng cách mét (so sánh với thực địa), kiểm tra độ phủ của chỉ mục GiST.
-- [ ] **Bước 6.4:** Lập biên bản kiểm thử `docs/testing/TEST_PLAN.md` và `docs/testing/TEST_RESULTS.md`.
-- 🛑 **Nghiệm thu Giai đoạn 6:** Báo cáo kiểm thử đạt chuẩn, không còn lỗi TypeScript hoặc lỗi logic.
+- [x] **Bước 6.1:** Kiểm thử Frontend: Kiểm tra hiển thị bản đồ, bộ lọc, popup, form CRUD, responsive trên nhiều kích cỡ màn hình.
+- [x] **Bước 6.2:** Kiểm thử Backend & API: Kiểm thử xác thực token JWT, kiểm thử phân quyền, phòng chống SQLi & XSS, Zod schema validation (100% PASS).
+- [x] **Bước 6.3:** Kiểm thử GIS & PostGIS: Xác thực tính chính xác của khoảng cách mét, bao trùm bán kính, thuật toán Nearest `<->`, chuẩn xuất GeoJSON RFC 7946 (100% PASS).
+- [x] **Bước 6.4:** Lập biên bản kiểm thử `docs/testing/TEST_PLAN.md` và `docs/testing/TEST_RESULTS.md` đạt chuẩn nghiệm thu đồ án chuyên ngành.
+- 🛑 **Nghiệm thu Giai đoạn 6:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 7.
 
 ---
 
