@@ -27,6 +27,43 @@ export const ingestionWorker = {
         if (weather.precipitation_mm_h > 0) {
           console.log(`[IngestionWorker] Ghi nhận mưa thực tế tại ${region.name}: ${weather.precipitation_mm_h} mm/h`);
 
+          // Ghi nhận vào CSDL quan trắc lượng mưa thực tế
+          try {
+            let stationId: string | null = null;
+            const { data: existingStation } = await supabaseAdmin
+              .from('rainfall_stations')
+              .select('id')
+              .eq('station_name', `[Vệ tinh] ${region.name}`)
+              .limit(1)
+              .maybeSingle();
+
+            if (existingStation?.id) {
+              stationId = existingStation.id;
+            } else {
+              const { data: createdStation } = await supabaseAdmin
+                .from('rainfall_stations')
+                .insert({
+                  station_name: `[Vệ tinh] ${region.name}`,
+                  location: `POINT(${region.lng} ${region.lat})`,
+                })
+                .select('id')
+                .single();
+              if (createdStation?.id) stationId = createdStation.id;
+            }
+
+            if (stationId) {
+              await supabaseAdmin.from('rainfall_observations').insert({
+                station_id: stationId,
+                observed_at: now.toISOString(),
+                rainfall_mm: weather.precipitation_mm_h,
+                duration_minutes: 60,
+              });
+              console.log(`[IngestionWorker] Đã ghi nhận bản ghi đo mưa thực tế vào CSDL (${weather.precipitation_mm_h} mm)`);
+            }
+          } catch (obsErr: any) {
+            console.warn(`[IngestionWorker] Ghi nhận đo mưa lỗi nhẹ:`, obsErr?.message);
+          }
+
           // 2. Nếu lượng mưa đạt ngưỡng cảnh báo (>= 20 mm/h)
           if (weather.precipitation_mm_h >= 20) {
             const alertLevel = weather.precipitation_mm_h >= 50 ? 'RED' : 'ORANGE';
