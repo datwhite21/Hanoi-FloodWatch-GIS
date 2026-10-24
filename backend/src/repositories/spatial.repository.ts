@@ -2,6 +2,42 @@ import { db } from '../config/database.js';
 import { supabaseAdmin } from '../config/supabase.js';
 import { FloodPoint } from '../types/index.js';
 
+// Trích xuất tọa độ từ định dạng GeoJSON hoặc WKT
+export function extractCoordinates(location: any): { lat: number; lng: number } {
+  let lat = 21.0285;
+  let lng = 105.8542;
+
+  if (!location) return { lat, lng };
+
+  // 1. Đối tượng GeoJSON: { type: 'Point', coordinates: [lng, lat] }
+  if (typeof location === 'object') {
+    if (Array.isArray(location.coordinates) && location.coordinates.length >= 2) {
+      lng = Number(location.coordinates[0]);
+      lat = Number(location.coordinates[1]);
+      return { lat, lng };
+    }
+    if (location.lat !== undefined && location.lng !== undefined) {
+      return { lat: Number(location.lat), lng: Number(location.lng) };
+    }
+    if (location.latitude !== undefined && location.longitude !== undefined) {
+      return { lat: Number(location.latitude), lng: Number(location.longitude) };
+    }
+  }
+
+  // 2. Chuỗi WKT: 'POINT(105.779 21.005)'
+  if (typeof location === 'string' && location.includes('POINT')) {
+    const matches = location.match(/\(([^)]+)\)/);
+    if (matches) {
+      const parts = matches[1].trim().split(/\s+/);
+      lng = parseFloat(parts[0]);
+      lat = parseFloat(parts[1]);
+      return { lat, lng };
+    }
+  }
+
+  return { lat, lng };
+}
+
 // Hàm tính khoảng cách trắc địa Haversine (mét) dùng làm giải pháp dự phòng khi chưa có DATABASE_URL
 function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3; // Bán kính Trái Đất (mét)
@@ -59,19 +95,7 @@ export const spatialRepository = {
     if (error || !data) throw new Error(error?.message || 'Không thể lấy dữ liệu điểm ngập');
 
     const pointsWithDistance = data.map((item: any) => {
-      // Parse coordinates từ WKT hoặc PostGIS representation
-      let pointLat = 21.0285;
-      let pointLng = 105.8542;
-      
-      if (item.location && typeof item.location === 'string' && item.location.includes('POINT')) {
-        const matches = item.location.match(/\(([^)]+)\)/);
-        if (matches) {
-          const parts = matches[1].split(' ');
-          pointLng = parseFloat(parts[0]);
-          pointLat = parseFloat(parts[1]);
-        }
-      }
-
+      const { lat: pointLat, lng: pointLng } = extractCoordinates(item.location);
       const dist = calculateHaversineDistance(lat, lng, pointLat, pointLng);
       return {
         ...item,

@@ -1,6 +1,7 @@
 import { db } from '../config/database.js';
 import { supabaseAdmin } from '../config/supabase.js';
 import { FloodPoint } from '../types/index.js';
+import { extractCoordinates } from './spatial.repository.js';
 
 export const floodPointsRepository = {
   async findAll(filters: {
@@ -99,16 +100,7 @@ export const floodPointsRepository = {
     if (error) throw new Error(error.message);
 
     const formatted = (data || []).map((item: any) => {
-      let lat = 21.0285;
-      let lng = 105.8542;
-      if (item.location && typeof item.location === 'string' && item.location.includes('POINT')) {
-        const matches = item.location.match(/\(([^)]+)\)/);
-        if (matches) {
-          const parts = matches[1].split(' ');
-          lng = parseFloat(parts[0]);
-          lat = parseFloat(parts[1]);
-        }
-      }
+      const { lat, lng } = extractCoordinates(item.location);
       return {
         ...item,
         area_name: item.administrative_areas?.name || null,
@@ -172,16 +164,7 @@ export const floodPointsRepository = {
 
     if (error || !data) return null;
 
-    let lat = 21.0285;
-    let lng = 105.8542;
-    if (data.location && typeof data.location === 'string' && data.location.includes('POINT')) {
-      const matches = data.location.match(/\(([^)]+)\)/);
-      if (matches) {
-        const parts = matches[1].split(' ');
-        lng = parseFloat(parts[0]);
-        lat = parseFloat(parts[1]);
-      }
-    }
+    const { lat, lng } = extractCoordinates(data.location);
 
     return {
       ...data,
