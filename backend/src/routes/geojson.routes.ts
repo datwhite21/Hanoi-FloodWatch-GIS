@@ -4,10 +4,10 @@ import { requireAuth, requireAdmin } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// GET /api/export/geojson - Xuất dữ liệu điểm ngập ra chuẩn GeoJSON RFC 7946
-router.get('/export', geojsonController.exportPoints);
+// GET /api/export/geojson, /api/geojson/export, /api/export
+router.get(['/', '/export', '/geojson'], geojsonController.exportPoints);
 
-// POST /api/import/geojson - Nhập dữ liệu từ file GeoJSON (Admin)
-router.post('/import', requireAuth, requireAdmin, geojsonController.importPoints);
+// POST /api/import/geojson, /api/geojson/import, /api/import (Admin)
+router.post(['/', '/import', '/geojson'], requireAuth, requireAdmin, geojsonController.importPoints);
 
 export default router;
