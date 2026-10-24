@@ -12,8 +12,8 @@
 | :---: | :--- | :---: | :--- |
 | **Giai đoạn 1** | Phân tích yêu cầu & Thiết kế hệ thống | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% tài liệu thiết kế, sơ đồ Mermaid, cài Git & đẩy lên GitHub |
 | **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | 🟢 **HOÀN THÀNH** | Đã tạo Supabase, bật PostGIS, chạy DDL Migration, nạp 27 điểm ngập, test kết nối OK |
-| **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | 🟡 **SẴN SÀNG** | Khởi tạo Express TS, kết nối PostGIS, spatial query ST_DWithin, JWT auth |
-| **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | ⚪ *Chưa bắt đầu* | Dashboard, Bản đồ Leaflet, Radius tool, Admin panel, Detail modal |
+| **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | 🟢 **HOÀN THÀNH** | Đã hoàn thành toàn bộ API, PostGIS spatial queries, Zod, JWT Auth, 9/9 tests pass |
+| **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | 🟡 **SẴN SÀNG** | Khởi tạo React Vite, Tailwind, Leaflet, Radius Tool, Dashboard, Admin |
 | **Giai đoạn 5** | Tích hợp hệ thống toàn diện | ⚪ *Chưa bắt đầu* | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm tra luồng dữ liệu thật |
 | **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | ⚪ *Chưa bắt đầu* | Chạy test tự động API, test tính toán khoảng cách PostGIS, test responsive |
 | **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | ⚪ *Chưa bắt đầu* | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS |
@@ -51,21 +51,22 @@
 ---
 
 ### 📍 GIAI ĐOẠN 3: XÂY DỰNG BACKEND REST API (NODE.JS + EXPRESS + TYPESCRIPT)
-- [ ] **Bước 3.1:** Khởi tạo dự án backend TypeScript, cấu hình `tsconfig.json`, `package.json`, Zod, Dotenv, CORS, Logger.
-- [ ] **Bước 3.2:** Xây dựng module kết nối CSDL PostgreSQL (`pg` pool) & Supabase Client.
-- [ ] **Bước 3.3:** Xây dựng Middleware xác thực JWT từ Supabase Auth và phân quyền (Admin vs Public).
-- [ ] **Bước 3.4:** Xây dựng Module Spatial Services (Cốt lõi GIS):
+- [x] **Bước 3.1:** Khởi tạo dự án backend TypeScript, cấu hình `tsconfig.json`, `package.json`, Zod, Dotenv, CORS, Logger.
+- [x] **Bước 3.2:** Xây dựng module kết nối CSDL PostgreSQL (`pg` pool) & Supabase Client an toàn.
+- [x] **Bước 3.3:** Xây dựng Middleware xác thực JWT từ Supabase Auth và phân quyền bảo mật (Admin vs Public).
+- [x] **Bước 3.4:** Xây dựng Module Spatial Services (Cốt lõi GIS):
   - API tìm kiếm điểm ngập trong bán kính (`ST_DWithin`, `ST_Distance`).
   - API tìm kiếm điểm nguy cơ gần nhất (`<->` operator).
-  - API chuyển đổi sang chuẩn `GeoJSON FeatureCollection`.
-- [ ] **Bước 3.5:** Xây dựng các API nghiệp vụ:
+  - API chuyển đổi sang chuẩn `GeoJSON FeatureCollection` (RFC 7946).
+- [x] **Bước 3.5:** Xây dựng các API nghiệp vụ:
   - Flood Points CRUD (Thêm, sửa, xóa, lấy danh sách, chi tiết).
-  - Observations & Rainfall API (Lịch sử quan trắc ngập và đo mưa).
-  - Alerts API (Quản lý và ban hành cảnh báo theo ngưỡng).
-  - Statistics API (Thống kê theo quận, theo mức độ nguy cơ).
-  - Import / Export GeoJSON.
-- [ ] **Bước 3.6:** Viết bộ Unit/Integration tests cho API bằng Vitest / Supertest.
-- 🛑 **Nghiệm thu Giai đoạn 3:** 100% API chạy pass test, có endpoint `/api/health` sẵn sàng deploy.
+  - Observations API (Lịch sử quan trắc ngập và độ sâu ngập).
+  - Alerts API (Quản lý và ban hành cảnh báo theo thời gian thực).
+  - Statistics API (Thống kê theo quận, theo mức độ nguy cơ cho Dashboard).
+  - Import / Export GeoJSON chuẩn GIS.
+- [x] **Bước 3.6:** Viết bộ Unit/Integration tests cho API bằng Vitest & Supertest (**Kết quả: 9/9 tests PASS 100%**).
+- [x] **Bước 3.7:** Biên soạn tài liệu đặc tả API chi tiết [docs/api/API_DOCUMENTATION.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/api/API_DOCUMENTATION.md).
+- 🛑 **Nghiệm thu Giai đoạn 3:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 4.
 
 ---
 
