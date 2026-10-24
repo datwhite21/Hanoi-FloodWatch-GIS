@@ -1,61 +1,64 @@
-# HANOI FLOODWATCH GIS
-### HỆ THỐNG WEBGIS THEO DÕI VÀ CẢNH BÁO NGUY CƠ NGẬP ÚNG ĐÔ THỊ TẠI HÀ NỘI
+# VIETNAM FLOODWATCH GIS
+### HỆ THỐNG WEBGIS GIÁM SÁT THỜI GIAN THỰC, VIỄN THÁM VỆ TINH & CẢNH BÁO BÃO LŨ TOÀN QUỐC
+*(Trọng tâm Rốn Lũ Miền Trung & Các Đô Thị Trọng Điểm)*
 
-**Cấp độ đề tài:** Đồ án Chuyên ngành Công nghệ Thông tin  
+**Cấp độ đề tài:** Đồ án Chuyên ngành Phát triển & Thiết kế Phần mềm (PTTKPM) / Hệ thống Thông tin Địa lý (GIS)  
 **Kho lưu trữ:** [https://github.com/datwhite21/Hanoi-FloodWatch-GIS](https://github.com/datwhite21/Hanoi-FloodWatch-GIS)  
 
+---
+
 ### 🌐 ĐỊA CHỈ TRUY CẬP TRỰC TUYẾN CHÍNH THỨC (24/7)
-- 🗺️ **Trang WebGIS Công khai (Frontend):** [https://hanoi-floodwatch-gis.pages.dev](https://hanoi-floodwatch-gis.pages.dev)
-- 📡 **Máy chủ Dịch vụ Không gian (Backend REST API):** [https://hanoi-floodwatch-gis-1.onrender.com](https://hanoi-floodwatch-gis-1.onrender.com)
+- 🗺️ **Hệ thống WebGIS Trực tuyến (Frontend Cloudflare):** [https://hanoi-floodwatch-gis.pages.dev](https://hanoi-floodwatch-gis.pages.dev)
+- 📡 **Máy chủ Dịch vụ Không gian (Backend Render):** [https://hanoi-floodwatch-gis-1.onrender.com](https://hanoi-floodwatch-gis-1.onrender.com)
 - 🩺 **Kiểm tra tình trạng máy chủ (Health Check):** [https://hanoi-floodwatch-gis-1.onrender.com/api/health](https://hanoi-floodwatch-gis-1.onrender.com/api/health)
-- 📋 **Hồ sơ Kết quả Kiểm thử (100% PASS):** [docs/testing/TEST_RESULTS.md](docs/testing/TEST_RESULTS.md)
-- 🚀 **Hướng dẫn Triển khai Cloud:** [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)
+- 🛰️ **API Thời tiết Vệ tinh Động (Open-Meteo Feed):** [https://hanoi-floodwatch-gis-1.onrender.com/api/weather/current?lat=16.4637&lng=107.5909](https://hanoi-floodwatch-gis-1.onrender.com/api/weather/current?lat=16.4637&lng=107.5909)
+- 📋 **Hồ sơ Kết quả Kiểm thử Toàn trình (100% PASS):** [docs/testing/TEST_RESULTS.md](docs/testing/TEST_RESULTS.md)
+- 📖 **Cẩm nang Hướng dẫn Sử dụng Chi tiết:** [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+- 📑 **Báo cáo Tổng kết Đồ án 5 Chương:** [docs/reports/PROJECT_REPORT.md](docs/reports/PROJECT_REPORT.md)
 
 ---
 
-## 1. GIỚI THIỆU ĐỀ TÀI
-Hà Nội là đô thị đặc biệt với tốc độ đô thị hóa nhanh, mật độ dân cư cao và thường xuyên đối mặt với các đợt ngập úng cục bộ nghiêm trọng mỗi khi có mưa lớn tập trung hoặc bão đổ bộ. Hệ thống **Hanoi FloodWatch GIS** được nghiên cứu và xây dựng nhằm cung cấp một giải pháp bản đồ trực tuyến (WebGIS) trực quan, hỗ trợ người dân và cơ quan quản lý:
-- Giám sát trực quan các điểm đen có nguy cơ ngập úng trên nền bản đồ số thủ đô Hà Nội.
-- Phân loại nguy cơ ngập khoa học (Cao, Trung bình, Thấp) dựa trên mô hình chấm điểm tần suất, độ sâu và thời gian rút nước.
-- Thực hiện các phép phân tích không gian chuyên sâu thông qua hệ quản trị CSDL không gian **PostgreSQL/PostGIS**:
-  - Truy vấn điểm ngập trong bán kính tùy chọn (500m, 1km, 2km, 3km, 5km) quanh vị trí người dùng.
-  - Tìm kiếm điểm nguy cơ ngập gần nhất bằng thuật toán k-Nearest Neighbors (`<->`).
-- Tiếp nhận và theo dõi các bản tin cảnh báo ngập úng theo thời gian thực.
-- Cung cấp cổng quản trị dữ liệu không gian cho phép cán bộ cập nhật số liệu hiện trường và xuất/nhập chuẩn định dạng `GeoJSON`.
+## 1. TỔNG QUAN & TÍNH CẤP THIẾT CỦA ĐỀ TÀI
+Việt Nam là quốc gia chịu ảnh hưởng nặng nề bởi thiên tai bão lũ, đặc biệt là **dải đất Miền Trung (Thừa Thiên Huế, Quảng Trị, Quảng Bình, Hà Tĩnh, Đà Nẵng, Quảng Nam)** – nơi được mệnh danh là "rốn lũ" của cả nước với lượng mưa có thể đạt 500 – 1.000 mm/đợt, gây ngập lụt diện rộng và cô lập các khu dân cư. Đồng thời tại các siêu đô thị như **Hà Nội** và **TP. Hồ Chí Minh**, triều cường kết hợp mưa lớn cục bộ liên tục gây ngập úng nghiêm trọng, làm đình trệ giao thông và thiệt hại kinh tế.
+
+Hệ thống **Vietnam FloodWatch GIS** được nghiên cứu và phát triển nhằm mục tiêu giải quyết bài toán trên bằng cách:
+1. **Dữ liệu Thực tế 100% (Clean Slate Architecture):** CSDL hoàn toàn sạch ban đầu (0 bản ghi giả lập/mock). Dữ liệu tự động phát sinh và vận động liên tục theo thời gian thực từ 2 nguồn: Vệ tinh viễn thám khí tượng và Báo cáo cộng đồng của người dân.
+2. **Viễn thám Vệ tinh Khí tượng Tự động (Satellite Weather Dynamic Feed):** Tích hợp dịch vụ vệ tinh Open-Meteo cập nhật lượng mưa theo giờ (mm/h), nhiệt độ, độ ẩm, sức gió và mã thời tiết chuẩn WMO tự động theo tọa độ GPS của người dùng tại bất kỳ đâu trên lãnh thổ Việt Nam.
+3. **Tiến trình Quan trắc Tự động Chạy ngầm (Background Ingestion Worker 24/7):** Quét định kỳ các trạm khí tượng thủy văn trọng điểm toàn quốc (Huế, Lệ Thủy, Đông Hà, Đà Nẵng, Hương Khê, Hà Nội, TP.HCM). Khi ghi nhận mưa lớn vượt ngưỡng (≥ 20mm/h hoặc ≥ 50mm/h), hệ thống tự động ghi nhật ký đo mưa (`rainfall_observations`) và phát sinh cảnh báo cấp bách (`flood_alerts`) với mốc thời gian thực tế `NOW()`.
+4. **Mạng lưới Báo ngập Cộng đồng (Citizen Crowdsourcing):** Cho phép người dân tại hiện trường sử dụng điện thoại thông minh định vị GPS, phản ánh trực quan độ sâu nước (Mắt cá chân ~15cm, Nửa bánh xe máy ~35cm, Ngập lũ sâu > 1m) kèm mô tả và hình ảnh. Điểm ngập được hiển thị tức thì lên bản đồ với hiệu ứng sóng radar nhấp nháy đồng bộ qua WebSockets.
+5. **Phân tích Không gian Chuyên sâu (Spatial GIS Analytics):** Ứng dụng PostgreSQL/PostGIS thực hiện truy vấn bán kính vùng ngập an toàn `ST_DWithin` và tìm kiếm điểm cảnh báo gần nhất bằng thuật toán k-Nearest Neighbors (`<->`).
 
 ---
 
-## 2. KIẾN TRÚC HỆ THỐNG
-Dự án được xây dựng theo mô hình phân tầng độc lập (3-Tier Decoupled Architecture):
-1. **Frontend (Presentation Tier):** Xây dựng bằng React 18, Vite, TypeScript, Leaflet, React-Leaflet, Tailwind CSS và Recharts. Triển khai CDN toàn cầu trên **Cloudflare Pages**.
-2. **Backend (Application/Logic Tier):** Xây dựng bằng Node.js LTS, Express.js, TypeScript, REST API, Zod Validation, Supabase JWT Auth Middleware. Triển khai Web Service trên **Render**.
-3. **Database (Data Tier):** CSDL đám mây PostgreSQL 15+ tích hợp **PostGIS Spatial Extension** trên **Supabase Cloud**, hỗ trợ chỉ mục không gian `GiST` và chính sách bảo mật hàng `Row Level Security (RLS)`.
+## 2. KIẾN TRÚC HỆ THỐNG (3-TIER DECOUPLED CLOUD)
+
+```mermaid
+graph TD
+    User["👤 Người dùng / Cư dân / Cán bộ"] -->|HTTPS / WSS| CDN["🌐 Cloudflare Pages CDN (Frontend React 18 + Vite)"]
+    CDN -->|GPS & Báo ngập| API["⚙️ Render Web Service (Node.js LTS + Express + PostGIS Engine)"]
+    API -->|Quan trắc vệ tinh| Meteo["🛰️ Open-Meteo Satellite Weather API (Zero Latency)"]
+    API -->|Lưu trữ & Truy vấn không gian| DB[("🐘 Supabase Cloud (PostgreSQL 15 + PostGIS Spatial Index)")]
+    Worker["⏱️ Background Ingestion Worker 24/7"] -->|Quét mưa vệ tinh định kỳ| Meteo
+    Worker -->|Tự động sinh Alert & Đo mưa| DB
+```
+
+1. **Frontend (Tầng Trình diễn):** React 18, TypeScript, Tailwind CSS, Leaflet GIS, Leaflet MarkerCluster, Recharts, Lucide Icons. Tích hợp chuyển đổi linh hoạt nhiều lớp bản đồ nền (Google Maps, Google Satellite, CartoDB Voyager, Esri Satellite, OpenStreetMap) đảm bảo hoạt động thông suốt không bị chặn tại Việt Nam.
+2. **Backend (Tầng Nghiệp vụ):** Node.js LTS, Express.js, TypeScript, RESTful API chuẩn, Zod Validation, Supabase Service Role API, Ingestion Background Worker.
+3. **Database (Tầng Dữ liệu Không gian):** PostgreSQL 15+ trên Supabase Cloud, tiện ích mở rộng PostGIS, hệ tọa độ chuẩn WGS 84 (EPSG:4326), chỉ mục không gian `GiST`, chính sách bảo vệ an toàn `Row Level Security (RLS)`.
 
 ---
 
-## 3. DANH MỤC TÀI LIỆU HỒ SƠ DỰ ÁN
-Bộ tài liệu kỹ thuật và thiết kế hoàn chỉnh được lưu trữ trong thư mục `docs/`:
-
-| Tài liệu | Mô tả nội dung | Đường dẫn |
-| :--- | :--- | :--- |
-| **Kế hoạch Dự án** | Tiến độ 7 giai đoạn, các mốc bàn giao và ma trận trách nhiệm | [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) |
-| **Đặc tả Yêu cầu (SRS)** | Yêu cầu chức năng, phi chức năng, phân loại dữ liệu, tác nhân | [docs/SRS.md](docs/SRS.md) |
-| **Kiến trúc Hệ thống** | Thiết kế 3 tầng, luồng xử lý không gian PostGIS, chiến lược Cloud | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
-| **Thiết kế CSDL** | Cấu trúc bảng, kiểu dữ liệu hình học EPSG:4326, chỉ mục GiST, RLS | [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) |
-| **Nguồn Dữ liệu & Tọa độ** | Bảng 27 điểm ngập thực tế Cầu Giấy, Thanh Xuân, Hà Đông kèm tọa độ | [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) |
-| **Sơ đồ Hệ thống** | Use Case, ERD, Sequence Diagram bằng chuẩn Mermaid | [docs/diagrams/SYSTEM_DIAGRAMS.md](docs/diagrams/SYSTEM_DIAGRAMS.md) |
-| **Thiết kế Giao diện (UI)** | Bảng màu chuyên nghiệp, Wireframe Dashboard, WebGIS Map, Admin | [docs/UI_DESIGN.md](docs/UI_DESIGN.md) |
+## 3. DANH SÁCH BỘ LỌC VÙNG MIỀN TOÀN QUỐC
+Hệ thống cho phép người dùng chuyển nhanh tiêu điểm quan sát trên bản đồ:
+- 🇻🇳 **Toàn quốc (Toàn cảnh Việt Nam):** Tọa độ trung tâm `[16.0544, 108.2022]`, Zoom cấp 6.
+- 🔴 **Rốn Lũ Miền Trung:** Tọa độ Thừa Thiên Huế & Quảng Trị `[16.4637, 107.5909]`, Zoom cấp 9. Trọng tâm giám sát bão lũ các tỉnh: Huế, Quảng Trị, Quảng Bình (Lệ Thủy), Hà Tĩnh (Hương Khê), Đà Nẵng, Quảng Nam.
+- 🏛️ **Miền Bắc (Hà Nội):** Tọa độ `[21.0285, 105.8542]`, Zoom cấp 12. Theo dõi các điểm ngập cục bộ tại Cầu Giấy, Thanh Xuân, Hà Đông, Hai Bà Trưng.
+- 🏙️ **Miền Nam (TP. Hồ Chí Minh):** Tọa độ `[10.8231, 106.6297]`, Zoom cấp 11. Theo dõi các điểm ngập triều cường tại Quận 7, Nhà Bè, Thủ Đức, Bình Thạnh.
 
 ---
 
-## 4. BẢNG MÀU PHÂN LOẠI NGUY CƠ TRÊN BẢN ĐỒ
-- 🔴 **Mức Cao (High Risk):** Ngập sâu > 40cm, giao thông tê liệt hoàn toàn (Phố Hoa Bằng, Phan Văn Trường, Nguyễn Trãi, Ba La, Hầm chui Thăng Long...).
-- 🟠 **Mức Trung bình (Medium Risk):** Ngập từ 20cm – 40cm, xe máy và ô tô gầm thấp di chuyển khó khăn (Trần Bình, Bùi Xương Trạch, Thái Hà, Tô Hiệu...).
-- 🟢 **Mức Thấp (Low Risk):** Ngập nhẹ < 20cm, nước rút nhanh dưới 30 phút (Đường Cầu Giấy, Lê Văn Lương, Bến xe Yên Nghĩa...).
-- ⚪ **Chưa đủ dữ liệu (Unknown / Demo):** Dữ liệu phản ánh mới hoặc kịch bản mô phỏng kiểm thử.
-
----
-
-## 5. TÌNH TRẠNG HIỆN TẠI & HƯỚNG DẪN BẢO VỆ
-- **Tình trạng:** Đã hoàn thành 100% xây dựng, kiểm thử và **Triển khai thành công lên Cloud Internet** (Giai đoạn 1 đến Giai đoạn 7).
-- **Hồ sơ bảo vệ đồ án:** Đầy đủ báo cáo 5 chương, slide thuyết trình và kịch bản demo trực tiếp tại [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) và [ROADMAP_TRACKER.md](ROADMAP_TRACKER.md).
+## 4. HƯỚNG DẪN DÀNH CHO NGƯỜI DÙNG & HỘI ĐỒNG
+- Chi tiết hướng dẫn vận hành, kiểm tra GPS thời tiết và gửi báo cáo ngập: xem [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
+- Chi tiết hướng dẫn cấu hình bảng CSDL trên Supabase: xem [docs/SUPABASE_MIGRATION_GUIDE.md](docs/SUPABASE_MIGRATION_GUIDE.md).
+- Toàn bộ kết quả kiểm thử đạt 100% PASS: xem [docs/testing/TEST_RESULTS.md](docs/testing/TEST_RESULTS.md).
+- Báo cáo tổng kết đồ án PTTKPM 5 chương: xem [docs/reports/PROJECT_REPORT.md](docs/reports/PROJECT_REPORT.md).
