@@ -14,8 +14,8 @@
 | **Giai đoạn 2** | Chuẩn bị CSDL Supabase Cloud & PostGIS | 🟢 **HOÀN THÀNH** | Đã tạo Supabase, bật PostGIS, chạy DDL Migration, nạp 27 điểm ngập, test kết nối OK |
 | **Giai đoạn 3** | Xây dựng Backend REST API (Express + TS) | 🟢 **HOÀN THÀNH** | Đã hoàn thành toàn bộ API, PostGIS spatial queries, Zod, JWT Auth, 9/9 tests pass |
 | **Giai đoạn 4** | Xây dựng Frontend WebGIS (React + Leaflet) | 🟢 **HOÀN THÀNH** | Đã hoàn thành 100% UI: Leaflet Map, Radius Tool, Dashboard, Admin, Build Vite OK |
-| **Giai đoạn 5** | Tích hợp hệ thống toàn diện | 🟡 **SẴN SÀNG** | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm tra luồng dữ liệu thật |
-| **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | ⚪ *Chưa bắt đầu* | Chạy test tự động API, test tính toán khoảng cách PostGIS, test responsive |
+| **Giai đoạn 5** | Tích hợp hệ thống toàn diện | 🟢 **HOÀN THÀNH** | Ghép nối Frontend ↔ Backend ↔ Supabase, kiểm thử E2E script 100% pass |
+| **Giai đoạn 6** | Kiểm thử chuyên sâu (Testing) | 🟡 **SẴN SÀNG** | Lập Test Plan, Test Results, kiểm thử GIS metric accuracy, bảo mật |
 | **Giai đoạn 7** | Triển khai Internet (Cloud Deployment) | ⚪ *Chưa bắt đầu* | Deploy Render (Backend) + Cloudflare Pages (Frontend) + HTTPS |
 | **Giai đoạn 8** | Hoàn thiện Báo cáo Đồ án & Slide Bảo vệ | ⚪ *Chưa bắt đầu* | Báo cáo 5 chương tiếng Việt, Slide 15-20 trang, Kịch bản demo hội đồng |
 
@@ -87,12 +87,13 @@
 ---
 
 ### 📍 GIAI ĐOẠN 5: TÍCH HỢP HỆ THỐNG TOÀN DIỆN
-- [ ] **Bước 5.1:** Kết nối Frontend ↔ Backend thông qua biến môi trường `VITE_API_URL`.
-- [ ] **Bước 5.2:** Kiểm thử tương tác dữ liệu thật:
-  - Thêm điểm ngập mới từ giao diện Admin $\rightarrow$ Lưu vào Supabase $\rightarrow$ Hiển thị ngay trên Bản đồ Public.
-  - Kiểm thử chức năng quét bán kính với dữ liệu tọa độ thật của Hà Nội.
-- [ ] **Bước 5.3:** Kiểm tra xử lý lỗi mạng, thông báo thân thiện khi Backend đang khởi động từ trạng thái ngủ.
-- 🛑 **Nghiệm thu Giai đoạn 5:** Mọi luồng tương tác hoạt động trơn tru không lỗi phát sinh.
+- [x] **Bước 5.1:** Kết nối Frontend ↔ Backend thông qua biến môi trường `VITE_API_URL` và cấu hình Proxy Vite (`/api`).
+- [x] **Bước 5.2:** Kiểm thử tương tác dữ liệu thật:
+  - Thêm điểm ngập mới $\rightarrow$ Lưu vào Supabase $\rightarrow$ Hiển thị trên Bản đồ Public với tọa độ GeoJSON chính xác.
+  - Kiểm thử chức năng quét bán kính với dữ liệu tọa độ thật của Hà Nội (`ST_DWithin` & `ST_Distance` PostGIS).
+  - Khởi tạo script kiểm thử tự động toàn trình `database/scripts/test_integration.js` đạt 100% PASS.
+- [x] **Bước 5.3:** Kiểm tra xử lý lỗi mạng, phân quyền JWT Bearer Token đối với các thao tác nhạy cảm, CORS an toàn.
+- 🛑 **Nghiệm thu Giai đoạn 5:** ĐÃ HOÀN THÀNH TOÀN DIỆN (100%). Sẵn sàng chuyển sang Giai đoạn 6.
 
 ---
 
