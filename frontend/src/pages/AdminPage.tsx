@@ -20,7 +20,7 @@ import { FloodPoint, FloodAlert } from '../types';
 import { LeafletMap } from '../components/map/LeafletMap';
 
 export const AdminPage: React.FC = () => {
-  const { user, isAdmin, token } = useAuth();
+  const { user, isAdmin, token, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'points' | 'alerts' | 'geojson'>('points');
@@ -55,10 +55,10 @@ export const AdminPage: React.FC = () => {
 
   // Kiểm tra quyền Admin
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
+    if (!isAuthLoading && !isAdmin) {
       navigate('/login');
     }
-  }, [isAdmin, isLoading, navigate]);
+  }, [isAdmin, isAuthLoading, navigate]);
 
   // Tải dữ liệu ban đầu
   async function loadData() {

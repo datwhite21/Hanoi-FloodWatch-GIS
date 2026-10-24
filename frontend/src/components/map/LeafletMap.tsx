@@ -139,11 +139,15 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     markersLayerRef.current.clearLayers();
 
     points.forEach((point) => {
+      const lat = Number(point.latitude);
+      const lng = Number(point.longitude);
+      if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return;
+
       const isSelected = selectedPointId === point.id;
       const isHighRisk = point.risk_level === 'HIGH';
       const icon = createCustomMarkerIcon(point.risk_level, isSelected, isHighRisk);
 
-      const marker = L.marker([point.latitude, point.longitude], { icon });
+      const marker = L.marker([lat, lng], { icon });
 
       // Nội dung Popup chi tiết đẹp mắt
       const riskBadgeColor =
