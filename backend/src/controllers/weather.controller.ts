@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { weatherService } from '../services/weather.service.js';
+import { MONITORING_REGIONS } from '../workers/ingestion.worker.js';
 
 export const weatherController = {
   async getCurrent(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -17,4 +18,26 @@ export const weatherController = {
       next(error);
     }
   },
+
+  async getStationsOverview(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const results = await Promise.all(
+        MONITORING_REGIONS.map(async (region) => {
+          const weather = await weatherService.getCurrentWeather(region.lat, region.lng);
+          return {
+            ...region,
+            weather,
+          };
+        })
+      );
+      res.status(200).json({
+        success: true,
+        count: results.length,
+        data: results,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
+

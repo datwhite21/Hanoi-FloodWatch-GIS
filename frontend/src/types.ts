@@ -113,3 +113,12 @@ export interface LiveWeatherData {
   updated_at: string;
   source: string;
 }
+
+export interface WeatherStation {
+  code: string;
+  name: string;
+  lat: number;
+  lng: number;
+  type: string;
+  weather: LiveWeatherData;
+}

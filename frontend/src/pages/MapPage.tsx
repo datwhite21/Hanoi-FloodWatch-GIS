@@ -19,6 +19,7 @@ export const MapPage: React.FC = () => {
   const [points, setPoints] = useState<FloodPoint[]>([]);
   const [filteredPoints, setFilteredPoints] = useState<FloodPoint[]>([]);
   const [citizenReports, setCitizenReports] = useState<CitizenReport[]>([]);
+  const [weatherStations, setWeatherStations] = useState<import('../types').WeatherStation[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<FloodPoint | null>(null);
   const [activeRegion, setActiveRegion] = useState('central');
   const [mapCenter, setMapCenter] = useState<[number, number]>([16.4637, 107.5909]); // Mặc định hiển thị Miền Trung
@@ -62,9 +63,22 @@ export const MapPage: React.FC = () => {
     }
   }
 
+  // 1c. Tải các trạm viễn thám vệ tinh trực tiếp toàn quốc
+  async function loadWeatherStations() {
+    try {
+      const res = await api.getWeatherStations();
+      if (res && res.data) {
+        setWeatherStations(res.data);
+      }
+    } catch (err) {
+      console.warn('Lỗi tải trạm vệ tinh:', err);
+    }
+  }
+
   useEffect(() => {
     loadPoints();
     loadCitizenReports();
+    loadWeatherStations();
 
     // Kết nối Supabase Realtime để nhận báo cáo mới tức thời
     const channel = supabase
@@ -188,6 +202,7 @@ export const MapPage: React.FC = () => {
         <LeafletMap
           points={isRadiusActive && radiusCenter ? radiusResults : filteredPoints}
           citizenReports={citizenReports}
+          weatherStations={weatherStations}
           center={mapCenter}
           zoom={mapZoom}
           radiusCenter={radiusCenter}
@@ -221,9 +236,10 @@ export const MapPage: React.FC = () => {
             onClick={() => {
               loadPoints();
               loadCitizenReports();
+              loadWeatherStations();
             }}
             className="p-1.5 text-slate-500 hover:text-blue-600 rounded-lg hover:bg-slate-100 transition-colors ml-1"
-            title="Làm mới dữ liệu từ CSDL"
+            title="Làm mới dữ liệu từ CSDL và Vệ tinh"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-blue-600' : ''}`} />
           </button>

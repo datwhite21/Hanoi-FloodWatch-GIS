@@ -150,6 +150,10 @@ export const api = {
     return fetchJSON(`/weather/current?lat=${lat}&lng=${lng}`);
   },
 
+  async getWeatherStations(): Promise<{ data: import('../types').WeatherStation[]; count: number }> {
+    return fetchJSON('/weather/stations');
+  },
+
   // Báo cáo ngập cộng đồng thời gian thực
   async getCitizenReports(): Promise<{ data: import('../types').CitizenReport[] }> {
     return fetchJSON('/citizen-reports/active');

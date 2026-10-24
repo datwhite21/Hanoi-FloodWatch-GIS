@@ -5,6 +5,7 @@ import { FloodPoint, RiskLevel, CitizenReport } from '../../types';
 interface LeafletMapProps {
   points: FloodPoint[];
   citizenReports?: CitizenReport[];
+  weatherStations?: import('../../types').WeatherStation[];
   center?: [number, number];
   zoom?: number;
   radiusCenter?: [number, number] | null;
@@ -94,9 +95,33 @@ function createCitizenMarkerIcon(waterDepthLevel: string): L.DivIcon {
   });
 }
 
+function createWeatherStationIcon(name: string, temp: number): L.DivIcon {
+  const shortName = name.replace('Thủ đô ', '').replace('TP. ', '').split(',')[0];
+  const html = `
+    <div class="relative flex items-center justify-center group" style="width: 36px; height: 36px;">
+      <span class="absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-60 animate-ping"></span>
+      <div class="relative w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-700 text-white flex items-center justify-center border-2 border-white shadow-xl text-sm font-bold">
+        🛰️
+      </div>
+      <div class="absolute -bottom-5 whitespace-nowrap bg-slate-900/90 text-white text-[10px] px-1.5 py-0.5 rounded shadow pointer-events-none font-semibold border border-slate-700 backdrop-blur-xs">
+        ${shortName} ${temp}°C
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    html,
+    className: 'custom-weather-station-icon',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -20],
+  });
+}
+
 export const LeafletMap: React.FC<LeafletMapProps> = ({
   points,
   citizenReports = [],
+  weatherStations = [],
   center = [21.0285, 105.8542], // Tọa độ trung tâm Hà Nội
   zoom = 13,
   radiusCenter = null,
@@ -111,6 +136,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const citizenLayerRef = useRef<L.LayerGroup | null>(null);
+  const weatherLayerRef = useRef<L.LayerGroup | null>(null);
   const radiusCircleRef = useRef<L.Circle | null>(null);
   const centerMarkerRef = useRef<L.Marker | null>(null);
 
@@ -166,6 +192,9 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     const citizenLayer = L.layerGroup().addTo(map);
     citizenLayerRef.current = citizenLayer;
 
+    const weatherLayer = L.layerGroup().addTo(map);
+    weatherLayerRef.current = weatherLayer;
+
     // Bộ chọn lớp bản đồ nền & lớp phủ sự kiện
     L.control.layers(
       {
@@ -176,6 +205,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         '📍 OpenStreetMap': osmLayer,
       },
       {
+        '🛰️ Trạm Viễn thám Vệ tinh': weatherLayer,
         '📢 Báo cáo Cộng đồng': citizenLayer,
       },
       { position: 'topright' }
@@ -344,7 +374,64 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     });
   }, [citizenReports]);
 
-  // 4. Render Vòng tròn Bán kính Không gian (Spatial Circle)
+  // 4. Render Các Trạm Quan Trắc Vệ Tinh Trực Tiếp (Live Satellite Stations)
+  useEffect(() => {
+    if (!weatherLayerRef.current) return;
+
+    weatherLayerRef.current.clearLayers();
+
+    weatherStations.forEach((st) => {
+      const lat = Number(st.lat);
+      const lng = Number(st.lng);
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      const icon = createWeatherStationIcon(st.name, st.weather?.temperature_c || 25);
+      const marker = L.marker([lat, lng], { icon });
+
+      const isRain = (st.weather?.precipitation_mm_h || 0) > 0;
+      const popupHtml = `
+        <div class="p-3 text-slate-800 space-y-2 min-w-[240px]">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+            <span class="text-xl">🛰️</span>
+            <div>
+              <h4 class="font-bold text-xs text-slate-900">${st.name}</h4>
+              <span class="text-[10px] text-cyan-600 font-bold uppercase tracking-wider">Trạm Viễn Thám Vệ Tinh 24/7</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium">Nhiệt độ</span>
+              <span class="font-extrabold text-slate-800 text-sm">${st.weather?.temperature_c || '--'}°C ${st.weather?.weather_icon || ''}</span>
+            </div>
+            <div class="bg-blue-50/60 p-2 rounded-lg border border-blue-100">
+              <span class="text-[10px] text-blue-600 block font-medium">Lượng mưa</span>
+              <span class="font-extrabold text-blue-700 text-sm">${(st.weather?.precipitation_mm_h || 0).toFixed(1)} mm/h</span>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium">Độ ẩm</span>
+              <span class="font-bold text-slate-700">${st.weather?.relative_humidity || '--'}%</span>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-medium">Gió</span>
+              <span class="font-bold text-slate-700">${st.weather?.wind_speed_kmh || '--'} km/h</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-600 font-medium">
+            Tình trạng: <strong>${st.weather?.weather_description || 'Bình thường'}</strong>
+          </div>
+          <div class="pt-1.5 border-t border-slate-100 text-[9px] text-slate-400 flex items-center justify-between">
+            <span>Vệ tinh WMO / ECMWF</span>
+            <span class="text-emerald-600 font-bold">● Đang phát trực tiếp</span>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml, { className: 'custom-leaflet-popup' });
+      weatherLayerRef.current?.addLayer(marker);
+    });
+  }, [weatherStations]);
+
+  // 5. Render Vòng tròn Bán kính Không gian (Spatial Circle)
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
