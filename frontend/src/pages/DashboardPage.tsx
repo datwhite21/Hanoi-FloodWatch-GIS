@@ -146,13 +146,13 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="mt-4 flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-slate-900">
-                {stats?.total_points || 27}
+                {stats?.total_points ?? 0}
               </span>
               <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                Điểm ngập trọng điểm
+                Điểm ngập ghi nhận
               </span>
             </div>
-            <p className="mt-2 text-[11px] text-slate-400">Khảo sát thực tế tại Cầu Giấy, Thanh Xuân, Hà Đông...</p>
+            <p className="mt-2 text-[11px] text-slate-400">Hệ thống giám sát không gian thời gian thực</p>
           </div>
 
           {/* CARD 2 */}
@@ -167,13 +167,13 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="mt-4 flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-red-600">
-                {stats?.high_risk_count || 12}
+                {stats?.high_risk_count ?? 0}
               </span>
               <span className="text-xs font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
                 Giao thông tê liệt
               </span>
             </div>
-            <p className="mt-2 text-[11px] text-slate-400">Hoa Bằng, Phan Văn Trường, Nguyễn Trãi, Ba La...</p>
+            <p className="mt-2 text-[11px] text-slate-400">Điểm ngập sâu có nguy cơ ngập lụt nghiêm trọng</p>
           </div>
 
           {/* CARD 3 */}
@@ -311,23 +311,30 @@ export const DashboardPage: React.FC = () => {
                 <p className="text-xs text-slate-500">Thống kê số lượng điểm ngập tại các quận trọng điểm Hà Nội</p>
               </div>
               <span className="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg">
-                Dữ liệu HSDC 2024
+                Dữ liệu Quan trắc Trực tuyến
               </span>
             </div>
 
             <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats?.points_by_area || []} margin={{ top: 10, right: 10, left: -20, bottom: 25 }}>
-                  <XAxis dataKey="area_name" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11 }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                  <Tooltip
-                    formatter={(val) => [`${val} điểm ngập`, 'Số lượng']}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
-                  />
-                  <Bar dataKey="point_count" fill="#2563eb" radius={[6, 6, 0, 0]} name="Tổng số điểm" />
-                  <Bar dataKey="high_risk_count" fill="#dc2626" radius={[6, 6, 0, 0]} name="Nguy cơ cao" />
-                </BarChart>
-              </ResponsiveContainer>
+              {stats?.points_by_area && stats.points_by_area.some((a) => a.point_count > 0) ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.points_by_area} margin={{ top: 10, right: 10, left: -20, bottom: 25 }}>
+                    <XAxis dataKey="area_name" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11 }} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                    <Tooltip
+                      formatter={(val) => [`${val} điểm ngập`, 'Số lượng']}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
+                    />
+                    <Bar dataKey="point_count" fill="#2563eb" radius={[6, 6, 0, 0]} name="Tổng số điểm" />
+                    <Bar dataKey="high_risk_count" fill="#dc2626" radius={[6, 6, 0, 0]} name="Nguy cơ cao" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 text-xs">
+                  <ShieldCheck className="w-8 h-8 text-emerald-500 mb-2" />
+                  <span>Chưa có dữ liệu ngập lụt. Hệ thống đang sẵn sàng tiếp nhận dữ liệu thời gian thực.</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -339,28 +346,35 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             <div className="h-64 w-full flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={riskPieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {riskPieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val) => [`${val} điểm`, 'Số lượng']}
-                    contentStyle={{ borderRadius: '12px', fontSize: '12px' }}
-                  />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
-                </PieChart>
-              </ResponsiveContainer>
+              {riskPieData.some((d) => d.value > 0) ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={riskPieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {riskPieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(val) => [`${val} điểm`, 'Số lượng']}
+                      contentStyle={{ borderRadius: '12px', fontSize: '12px' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center text-center p-6 text-slate-400 text-xs">
+                  <span className="text-2xl mb-1">🌤️</span>
+                  <span>Hiện tại không có điểm ngập nào trong CSDL.</span>
+                </div>
+              )}
             </div>
 
             <div className="text-[11px] text-slate-500 text-center border-t border-slate-100 pt-3">
