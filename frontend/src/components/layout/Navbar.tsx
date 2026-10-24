@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Waves, Map, LayoutDashboard, Shield, LogIn, LogOut, Menu, X, AlertTriangle } from 'lucide-react';
+import { Waves, Map, LayoutDashboard, Shield, LogIn, LogOut, Menu, X, AlertTriangle, Megaphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { LiveWeatherWidget } from '../weather/LiveWeatherWidget';
 
 interface NavbarProps {
   activeAlertCount?: number;
+  onOpenReportModal?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeAlertCount = 0 }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeAlertCount = 0, onOpenReportModal }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { user, isAdmin, logout } = useAuth();
@@ -20,20 +22,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeAlertCount = 0 }) => {
         <div className="flex items-center justify-between h-16">
           {/* LOGO & BRAND */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
               <Waves className="w-6 h-6 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-brand-600 transition-colors">
-                  Hanoi FloodWatch
+                <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                  Vietnam FloodWatch
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
                   GIS
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Giám sát & Cảnh báo ngập úng đô thị
+                Mạng lưới cảnh báo ngập lụt quốc gia
               </p>
             </div>
           </Link>
@@ -80,7 +82,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeAlertCount = 0 }) => {
           </nav>
 
           {/* USER ACTIONS & LIVE ALERT TICKER BADGE */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2.5">
+            {/* THỜI TIẾT VỆ TINH REALTIME */}
+            <LiveWeatherWidget />
+
+            {/* NÚT BÁO NGẬP CỘNG ĐỒNG */}
+            {onOpenReportModal && (
+              <button
+                type="button"
+                onClick={onOpenReportModal}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all active:scale-95"
+                title="Báo ngập tức thời từ vị trí GPS của bạn"
+              >
+                <Megaphone className="w-3.5 h-3.5" />
+                <span>Báo ngập</span>
+              </button>
+            )}
+
             {activeAlertCount > 0 && (
               <Link
                 to="/map"
@@ -113,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeAlertCount = 0 }) => {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-all duration-200"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-xs transition-all duration-200"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 Đăng nhập Admin

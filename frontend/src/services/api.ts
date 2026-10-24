@@ -144,4 +144,36 @@ export const api = {
       body: JSON.stringify(geojsonData),
     });
   },
+
+  // Thời tiết vệ tinh Open-Meteo
+  async getLiveWeather(lat: number = 21.0285, lng: number = 105.8542): Promise<{ data: import('../types').LiveWeatherData }> {
+    return fetchJSON(`/weather/current?lat=${lat}&lng=${lng}`);
+  },
+
+  // Báo cáo ngập cộng đồng thời gian thực
+  async getCitizenReports(): Promise<{ data: import('../types').CitizenReport[] }> {
+    return fetchJSON('/citizen-reports/active');
+  },
+
+  async submitCitizenReport(payload: {
+    reporter_name?: string;
+    latitude: number;
+    longitude: number;
+    address: string;
+    city_province?: string;
+    water_depth_level: 'ANKLE' | 'HALF_WHEEL' | 'FLOOD_DEEP';
+    estimated_depth_cm: number;
+    description?: string;
+  }): Promise<{ data: import('../types').CitizenReport; message: string }> {
+    return fetchJSON('/citizen-reports', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async upvoteCitizenReport(id: string): Promise<{ data: any }> {
+    return fetchJSON(`/citizen-reports/${id}/upvote`, {
+      method: 'POST',
+    });
+  },
 };

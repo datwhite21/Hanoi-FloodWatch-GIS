@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { FloodPoint, RiskLevel } from '../../types';
+import { FloodPoint, RiskLevel, CitizenReport } from '../../types';
 
 interface LeafletMapProps {
   points: FloodPoint[];
+  citizenReports?: CitizenReport[];
   center?: [number, number];
   zoom?: number;
   radiusCenter?: [number, number] | null;
@@ -11,6 +12,7 @@ interface LeafletMapProps {
   selectedPointId?: string | null;
   onMapClick?: (lat: number, lng: number) => void;
   onPointSelect?: (point: FloodPoint) => void;
+  onCitizenUpvote?: (id: string) => void;
   className?: string;
   isPinpointMode?: boolean;
 }
@@ -68,8 +70,33 @@ const centerPinIcon = L.divIcon({
   iconAnchor: [14, 14],
 });
 
+// Icon sóng radar cho Báo cáo Ngập Cộng đồng thời gian thực
+function createCitizenMarkerIcon(waterDepthLevel: string): L.DivIcon {
+  const isFloodDeep = waterDepthLevel === 'FLOOD_DEEP';
+  const color = isFloodDeep ? '#ef4444' : waterDepthLevel === 'HALF_WHEEL' ? '#f59e0b' : '#10b981';
+  const ringColor = isFloodDeep ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.4)';
+
+  const html = `
+    <div class="relative flex items-center justify-center" style="width: 36px; height: 36px;">
+      <div style="background-color: ${ringColor};" class="w-9 h-9 rounded-full animate-ping absolute"></div>
+      <div style="background-color: ${color}; box-shadow: 0 0 12px ${ringColor};" class="w-8 h-8 rounded-full flex items-center justify-center text-white border-2 border-white shadow-xl relative z-10 font-bold text-xs">
+        <span>📢</span>
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    html,
+    className: 'citizen-radar-icon',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18],
+  });
+}
+
 export const LeafletMap: React.FC<LeafletMapProps> = ({
   points,
+  citizenReports = [],
   center = [21.0285, 105.8542], // Tọa độ trung tâm Hà Nội
   zoom = 13,
   radiusCenter = null,
@@ -83,6 +110,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const citizenLayerRef = useRef<L.LayerGroup | null>(null);
   const radiusCircleRef = useRef<L.Circle | null>(null);
   const centerMarkerRef = useRef<L.Marker | null>(null);
 
@@ -132,7 +160,13 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     // Đặt Google Maps làm lớp bản đồ hiển thị mặc định
     googleRoadLayer.addTo(map);
 
-    // Bộ chọn lớp bản đồ nền (Base Layers Control) đa dạng
+    const markersLayer = L.layerGroup().addTo(map);
+    markersLayerRef.current = markersLayer;
+
+    const citizenLayer = L.layerGroup().addTo(map);
+    citizenLayerRef.current = citizenLayer;
+
+    // Bộ chọn lớp bản đồ nền & lớp phủ sự kiện
     L.control.layers(
       {
         '🗺️ Google Maps': googleRoadLayer,
@@ -141,7 +175,9 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         '🌍 Esri Vệ tinh': satelliteLayer,
         '📍 OpenStreetMap': osmLayer,
       },
-      undefined,
+      {
+        '📢 Báo cáo Cộng đồng': citizenLayer,
+      },
       { position: 'topright' }
     ).addTo(map);
 
@@ -157,9 +193,6 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         onMapClick(e.latlng.lat, e.latlng.lng);
       }
     });
-
-    const markersLayer = L.layerGroup().addTo(map);
-    markersLayerRef.current = markersLayer;
     mapInstanceRef.current = map;
 
     // Cập nhật lại kích thước bản đồ theo các mốc thời gian để đảm bảo hiển thị đủ 100%
@@ -260,6 +293,56 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       markersLayerRef.current?.addLayer(marker);
     });
   }, [points, selectedPointId]);
+
+  // 3b. Render các Marker Báo cáo Cộng đồng Thời gian thực (Pulsating Radar Pins)
+  useEffect(() => {
+    if (!mapInstanceRef.current || !citizenLayerRef.current) return;
+
+    citizenLayerRef.current.clearLayers();
+
+    citizenReports.forEach((report) => {
+      const lat = Number(report.latitude);
+      const lng = Number(report.longitude);
+      if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return;
+
+      const icon = createCitizenMarkerIcon(report.water_depth_level);
+      const marker = L.marker([lat, lng], { icon });
+
+      const depthLabel =
+        report.water_depth_level === 'FLOOD_DEEP'
+          ? '🔴 Lũ sâu nguy hiểm (> 1m)'
+          : report.water_depth_level === 'HALF_WHEEL'
+          ? '🟡 Nửa bánh xe (~35cm)'
+          : '🟢 Mắt cá chân (~15cm)';
+
+      const timeAgo = report.created_at
+        ? new Date(report.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+        : 'Vừa xong';
+
+      const popupHtml = `
+        <div class="p-3.5 space-y-2 min-w-[240px] max-w-[280px]">
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+              📢 Báo cáo Cộng đồng
+            </span>
+            <span class="text-[10px] text-slate-400">${timeAgo}</span>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900 leading-snug">${report.address}</h3>
+          <p class="text-xs font-semibold text-slate-700">${depthLabel}</p>
+          ${report.description ? `<p class="text-[11px] text-slate-500 italic">"${report.description}"</p>` : ''}
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="text-[10px] text-slate-400">Báo bởi: <strong>${report.reporter_name || 'Người dân'}</strong></span>
+            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              👍 ${report.upvotes || 1} xác nhận
+            </span>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml, { className: 'custom-leaflet-popup' });
+      citizenLayerRef.current?.addLayer(marker);
+    });
+  }, [citizenReports]);
 
   // 4. Render Vòng tròn Bán kính Không gian (Spatial Circle)
   useEffect(() => {

@@ -80,3 +80,36 @@ export interface UserProfile {
   role: 'admin' | 'user';
   display_name?: string;
 }
+
+export interface CitizenReport {
+  id: string;
+  reporter_name?: string;
+  reporter_phone?: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+  city_province?: string;
+  water_depth_level: 'ANKLE' | 'HALF_WHEEL' | 'FLOOD_DEEP';
+  estimated_depth_cm: number;
+  description?: string;
+  image_url?: string;
+  status: 'ACTIVE' | 'VERIFIED' | 'RESOLVED';
+  upvotes: number;
+  created_at: string;
+}
+
+export interface LiveWeatherData {
+  latitude: number;
+  longitude: number;
+  temperature_c: number;
+  relative_humidity: number;
+  precipitation_mm_h: number;
+  rain_mm_h: number;
+  wind_speed_kmh: number;
+  weather_code: number;
+  weather_description: string;
+  weather_icon: string;
+  risk_level: 'SAFE' | 'ADVISORY' | 'WARNING' | 'DANGER';
+  updated_at: string;
+  source: string;
+}

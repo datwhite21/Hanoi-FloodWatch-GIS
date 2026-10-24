@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
-import { FloodPoint } from '../types';
+import { FloodPoint, CitizenReport } from '../types';
+import { supabase } from '../services/supabase';
 import { LeafletMap } from '../components/map/LeafletMap';
 import { MapSidebar } from '../components/map/MapSidebar';
 import { RadiusTool } from '../components/map/RadiusTool';
 import { MapLegend } from '../components/map/MapLegend';
-import { Download, Compass, RefreshCw } from 'lucide-react';
+import { Download, Compass, RefreshCw, Layers } from 'lucide-react';
+
+const REGIONS = [
+  { id: 'all', name: '🇻🇳 Toàn quốc', center: [16.0544, 108.2022] as [number, number], zoom: 6 },
+  { id: 'central', name: '🔴 Rốn Lũ Miền Trung', center: [16.4637, 107.5909] as [number, number], zoom: 9 },
+  { id: 'north', name: '🏛️ Miền Bắc (Hà Nội)', center: [21.0285, 105.8542] as [number, number], zoom: 12 },
+  { id: 'south', name: '🏙️ Miền Nam (TP.HCM)', center: [10.8231, 106.6297] as [number, number], zoom: 11 },
+];
 
 export const MapPage: React.FC = () => {
   const [points, setPoints] = useState<FloodPoint[]>([]);
   const [filteredPoints, setFilteredPoints] = useState<FloodPoint[]>([]);
+  const [citizenReports, setCitizenReports] = useState<CitizenReport[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<FloodPoint | null>(null);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([21.0268, 105.7942]); // Yên Hòa, Cầu Giấy
-  const [mapZoom, setMapZoom] = useState(13);
+  const [activeRegion, setActiveRegion] = useState('central');
+  const [mapCenter, setMapCenter] = useState<[number, number]>([16.4637, 107.5909]); // Mặc định hiển thị Miền Trung
+  const [mapZoom, setMapZoom] = useState(9);
 
   // Bộ lọc
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,8 +50,33 @@ export const MapPage: React.FC = () => {
     }
   }
 
+  // 1b. Tải danh sách báo cáo ngập cộng đồng thời gian thực
+  async function loadCitizenReports() {
+    try {
+      const res = await api.getCitizenReports();
+      if (res && res.data) {
+        setCitizenReports(res.data);
+      }
+    } catch (err) {
+      console.warn('Lỗi tải báo cáo cộng đồng:', err);
+    }
+  }
+
   useEffect(() => {
     loadPoints();
+    loadCitizenReports();
+
+    // Kết nối Supabase Realtime để nhận báo cáo mới tức thời
+    const channel = supabase
+      .channel('realtime-citizen-reports-map')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'citizen_reports' }, () => {
+        loadCitizenReports();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // 2. Xử lý bộ lọc phía Client
@@ -152,6 +187,7 @@ export const MapPage: React.FC = () => {
       <div className="flex-1 relative h-full w-full">
         <LeafletMap
           points={isRadiusActive && radiusCenter ? radiusResults : filteredPoints}
+          citizenReports={citizenReports}
           center={mapCenter}
           zoom={mapZoom}
           radiusCenter={radiusCenter}
@@ -161,6 +197,37 @@ export const MapPage: React.FC = () => {
           onPointSelect={handleSelectPoint}
           isPinpointMode={isRadiusActive && !radiusCenter}
         />
+
+        {/* BỘ CHỌN VÙNG MIỀN NHANH TOÀN QUỐC (ĐẶC BIỆT RỐN LŨ MIỀN TRUNG) */}
+        <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-1 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl shadow-lg border border-slate-200">
+          {REGIONS.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => {
+                setActiveRegion(r.id);
+                setMapCenter(r.center);
+                setMapZoom(r.zoom);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activeRegion === r.id
+                  ? 'bg-blue-600 text-white shadow-xs scale-102'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              {r.name}
+            </button>
+          ))}
+          <button
+            onClick={() => {
+              loadPoints();
+              loadCitizenReports();
+            }}
+            className="p-1.5 text-slate-500 hover:text-blue-600 rounded-lg hover:bg-slate-100 transition-colors ml-1"
+            title="Làm mới dữ liệu từ CSDL"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-blue-600' : ''}`} />
+          </button>
+        </div>
 
         {/* CÔNG CỤ BÁN KÍNH NẰM GÓC TRÊN BÊN PHẢI */}
         <div className="absolute top-4 right-4 z-[400]">
@@ -180,29 +247,6 @@ export const MapPage: React.FC = () => {
         {/* CHÚ GIẢI BẢN ĐỒ GÓC DƯỚI BÊN TRÁI */}
         <div className="absolute bottom-6 left-4 z-[400] max-w-xs">
           <MapLegend />
-        </div>
-
-        {/* THANH CÔNG CỤ NHANH GÓC TRÊN BÊN TRÁI */}
-        <div className="absolute top-4 left-4 z-[400] flex items-center gap-2">
-          <button
-            onClick={loadPoints}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/95 backdrop-blur-md text-slate-700 rounded-xl shadow-md border border-slate-200 text-xs font-semibold hover:bg-slate-100 transition-colors"
-            title="Làm mới dữ liệu từ CSDL"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-brand-600' : ''}`} />
-            <span className="hidden sm:inline">Làm mới</span>
-          </button>
-
-          <a
-            href={api.getExportGeoJSONUrl()}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/95 backdrop-blur-md text-slate-700 rounded-xl shadow-md border border-slate-200 text-xs font-semibold hover:bg-slate-100 transition-colors"
-            title="Tải về file GeoJSON để mở trên QGIS"
-          >
-            <Download className="w-3.5 h-3.5 text-brand-600" />
-            <span className="hidden sm:inline">Xuất GeoJSON</span>
-          </a>
         </div>
       </div>
     </div>

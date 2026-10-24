@@ -6,6 +6,9 @@ import observationsRouter from './observations.routes.js';
 import statisticsRouter from './statistics.routes.js';
 import geojsonRouter from './geojson.routes.js';
 import authRouter from './auth.routes.js';
+import weatherRouter from './weather.routes.js';
+import citizenReportsRouter from './citizenReports.routes.js';
+import { ingestionWorker } from '../workers/ingestion.worker.js';
 
 const apiRouter = Router();
 
@@ -19,6 +22,18 @@ apiRouter.use('/geojson', geojsonRouter);
 apiRouter.use('/export', geojsonRouter);
 apiRouter.use('/import', geojsonRouter);
 apiRouter.use('/auth', authRouter);
+apiRouter.use('/weather', weatherRouter);
+apiRouter.use('/citizen-reports', citizenReportsRouter);
+
+// Kích hoạt đồng bộ thời tiết vệ tinh thủ công
+apiRouter.post('/weather/sync', async (req, res) => {
+  try {
+    const result = await ingestionWorker.runIngestionCycle();
+    res.status(200).json({ success: true, message: 'Đã hoàn tất chu kỳ quét vệ tinh tự động', data: result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Health check endpoint phục vụ Render và giám sát
 apiRouter.get('/health', (req, res) => {
