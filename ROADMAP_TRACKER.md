@@ -35,8 +35,8 @@
   - [x] `docs/diagrams/SYSTEM_DIAGRAMS.md` (Use Case, ERD, Sequence Diagram Mermaid).
   - [x] `docs/UI_DESIGN.md` (Bảng màu, wireframe Dashboard, Map, Detail, Admin).
   - [x] `.env.example` & `.gitignore` & `README.md`.
-- [ ] **Bước 1.3:** Người dùng cài đặt xong Git for Windows theo hướng dẫn.
-- 🛑 **Nghiệm thu Giai đoạn 1:** Người dùng duyệt toàn bộ tài liệu thiết kế và xác nhận chuyển sang Giai đoạn 2.
+- [x] **Bước 1.3:** Người dùng cài đặt xong Git for Windows theo hướng dẫn (Đã xác minh: `git version 2.56.0.windows.3`, user: `datwhite21`).
+- [x] **Bước 1.4:** Khởi tạo local Git repository và commit ban đầu toàn bộ tài liệu thiết kế.
 
 ---
 
