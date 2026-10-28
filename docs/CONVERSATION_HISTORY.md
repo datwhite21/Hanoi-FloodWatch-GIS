@@ -196,3 +196,38 @@ journey
 5. 🛠️ [docs/SUPABASE_MIGRATION_GUIDE.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/SUPABASE_MIGRATION_GUIDE.md) – Hướng dẫn Thao tác Bảng CSDL trên Supabase dành cho Người dùng.
 6. 🧪 [docs/testing/TEST_RESULTS.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/testing/TEST_RESULTS.md) – Hồ sơ Kết quả Kiểm thử Tích hợp Toàn trình (100% PASS).
 7. 📜 [docs/CONVERSATION_HISTORY.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/CONVERSATION_HISTORY.md) – Toàn văn Biên bản Nhật ký Trao đổi và Quá trình Phát triển (Tệp tài liệu này).
+8. 🔍 [docs/REALTIME_DATA_AUDIT.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/REALTIME_DATA_AUDIT.md) – Báo cáo Kiểm toán Dữ liệu Thực tế (10 câu hỏi kiểm toán).
+9. 📐 [docs/DATA_PIPELINE.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/DATA_PIPELINE.md) – Đặc tả Kiến trúc Pipeline Thu thập Dữ liệu Động & Idempotency.
+10. ⚠️ [docs/ALERT_METHODOLOGY.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/ALERT_METHODOLOGY.md) – Phương pháp luận Đánh giá Nguy cơ & Phân loại 4 Cấp độ Cảnh báo.
+11. 🔑 [docs/MANUAL_SETUP_GUIDE.md](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/docs/MANUAL_SETUP_GUIDE.md) – Cẩm nang Phân quyền & Thiết lập Thủ công Dịch vụ Ngoài.
+
+---
+
+## 5. BƯỚC NÂNG CẤP TOÀN DIỆN V2 (MASTER PROMPT V2 - HOÀN THÀNH NGHIỆM THU)
+
+### 5.1. Bối cảnh & Yêu cầu Nâng cấp (Master Prompt V2)
+- Người dùng đặt yêu cầu nâng cấp toàn diện dự án Vietnam FloodWatch GIS phục vụ bảo vệ đồ án chuyên ngành đại học với các nguyên tắc cốt lõi:
+  1. Bảo toàn 100% dự án hiện tại, không cài lại từ đầu.
+  2. Tuyệt đối không dùng dữ liệu giả mạo (Zero Mock Data) – Dữ liệu phải có mốc thời gian kiểm chứng.
+  3. Phân định rạch ròi bản chất khoa học: Mô hình dự báo số trị ECMWF lưới ~9km vs Quan trắc mặt đất vật lý.
+  4. Khắc phục triệt để vấn đề Render Free Sleep làm gián đoạn Worker.
+  5. Thay đổi lớp bản đồ mặc định sang CartoDB Voyager hợp pháp.
+  6. Tôn trọng quyền kiểm soát tối cao của người dùng đối với các tài nguyên CSDL Cloud.
+
+### 5.2. Quá trình Thực thi & Kết quả Nghiệm thu
+- **Giai đoạn 1 (Kiểm toán - Audit):** Đã rà soát toàn diện và xuất bản `docs/REALTIME_DATA_AUDIT.md` cùng `docs/MANUAL_SETUP_GUIDE.md`.
+- **Giai đoạn 2 (Thiết kế Pipeline & Phương pháp luận):** Xuất bản `docs/DATA_PIPELINE.md`, `docs/ALERT_METHODOLOGY.md` và file migration an toàn `database/migrations/03_enhanced_schema.sql`.
+- **Giai đoạn 3 & 4 (Thi công Mã nguồn):**
+  - Cập nhật `weather.service.ts`: Xóa bỏ hoàn toàn fallback cứng, bổ sung `valid_at`, `fetched_at`, `quality_status`, `data_source`.
+  - Cập nhật `ingestion.worker.ts`: Chuẩn hóa tên trạm `[Mô hình ECMWF]`, lưu lượng mưa `0.0 mm/h` (`quality_status = 'DRY'`), chống trùng lặp dữ liệu (Idempotency), phát sinh cảnh báo tham khảo kỹ thuật.
+  - Xây dựng GitHub Actions Cron Scheduler (`.github/workflows/ingestion-cron.yml`) định kỳ 30 phút đánh thức Render và thu thập dữ liệu tự động.
+  - Cập nhật WebGIS Frontend: CartoDB Voyager làm lớp bản đồ mặc định, hiển thị huy hiệu kết nối động 7/7 điểm mô hình, lắng nghe Realtime WebSockets cho cả `citizen_reports` và `flood_points`.
+- **Giai đoạn 7 (Kiểm thử Tự động):**
+  - Chạy toàn bộ 12 ca kiểm thử tự động tại `backend/src/tests/api.test.ts` đạt kết quả **12/12 PASS (100%)**.
+  - Kiểm tra thực tế xác nhận cơ chế Idempotency hoạt động hoàn hảo: chu kỳ chạy lại tự động nhận diện và bỏ qua 7/7 điểm mà không gây trùng lặp.
+- **Thực thi Migration Supabase & Xác nhận Thực tế:**
+  - Người dùng đã chạy thành công `03_enhanced_schema.sql` trên Supabase SQL Editor.
+  - Kiểm tra thực tế: bảng `citizen_reports`, `ingestion_logs` và các cột metadata của `rainfall_observations` đã hoạt động 100%.
+  - Thử nghiệm gửi báo cáo cộng đồng kèm tọa độ GPS và upvote thành công tức thì.
+  - Cả hai máy chủ Production trên Cloud (Render Backend & Cloudflare Frontend) đều hoạt động trực tuyến với mã trạng thái HTTP 200 OK.
+
