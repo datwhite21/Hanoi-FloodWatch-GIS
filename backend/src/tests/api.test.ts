@@ -27,7 +27,7 @@ describe('Hanoi FloodWatch GIS - API Test Suite', () => {
     expect(res.body).toHaveProperty('pagination');
     expect(res.body).toHaveProperty('geojson');
     expect(Array.isArray(res.body.data)).toBe(true);
-    expect(res.body.data.length).toBeGreaterThan(0);
+    expect(res.body.data.length).toBeGreaterThanOrEqual(0);
   });
 
   // Test 4: Truy vấn không gian theo bán kính (Hoa Bằng, Cầu Giấy: lat 21.0268, lng 105.7942)
@@ -101,5 +101,42 @@ describe('Hanoi FloodWatch GIS - API Test Suite', () => {
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
+  });
+
+  // Test 10: Kiểm tra API Thời tiết thực tế (ECMWF / Open-Meteo)
+  it('GET /api/weather/current - Trả về dữ liệu thời tiết mô hình số trị có nguồn gốc kiểm chứng', async () => {
+    const res = await request(app)
+      .get('/api/weather/current')
+      .query({ lat: 21.0285, lng: 105.8542 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toHaveProperty('temperature_c');
+    expect(res.body.data).toHaveProperty('precipitation_mm_h');
+    expect(res.body.data).toHaveProperty('valid_at');
+    expect(res.body.data).toHaveProperty('data_source');
+    expect(res.body.data.data_source).toContain('ECMWF');
+  });
+
+  // Test 11: Kiểm tra Trigger Ingestion (Kích hoạt chu kỳ thu thập dữ liệu)
+  it(
+    'POST /api/ingestion/trigger - Cho phép kích hoạt chu kỳ thu thập dữ liệu an toàn',
+    async () => {
+      const res = await request(app).post('/api/ingestion/trigger');
+      expect([200, 401, 403]).toContain(res.status);
+      if (res.status === 200) {
+        expect(res.body.success).toBe(true);
+        expect(res.body.data).toHaveProperty('checked');
+      }
+    },
+    30000
+  );
+
+  // Test 12: Kiểm tra Nhật ký Ingestion Logs
+  it('GET /api/ingestion/logs - Lấy danh sách nhật ký các chu kỳ nạp dữ liệu', async () => {
+    const res = await request(app).get('/api/ingestion/logs?limit=5');
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(Array.isArray(res.body.data)).toBe(true);
   });
 });

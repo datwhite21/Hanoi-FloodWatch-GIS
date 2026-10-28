@@ -1,0 +1,45 @@
+name: Weather Ingestion Cron Scheduler
+
+on:
+  schedule:
+    # Chạy tự động mỗi 30 phút để đánh thức Render và thu thập dữ liệu khí tượng mô hình ECMWF
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    # Cho phép kích hoạt thủ công từ giao diện GitHub Actions
+
+jobs:
+  trigger-ingestion:
+    name: Trigger Weather & Flood Ingestion Cycle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Trigger Request to Production Backend
+        env:
+          API_URL: ${{ secrets.RENDER_API_URL || 'https://hanoi-floodwatch-gis-1.onrender.com' }}
+          INGESTION_SECRET_TOKEN: ${{ secrets.INGESTION_SECRET_TOKEN }}
+        run: |
+          echo "🌐 Gửi yêu cầu kích hoạt Ingestion tới: $API_URL/api/ingestion/trigger"
+          
+          if [ -n "$INGESTION_SECRET_TOKEN" ]; then
+            AUTH_HEADER="Authorization: Bearer $INGESTION_SECRET_TOKEN"
+          else
+            AUTH_HEADER="X-Cron-Source: github-actions"
+          fi
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$API_URL/api/ingestion/trigger" \
+            -H "Content-Type: application/json" \
+            -H "$AUTH_HEADER" \
+            --max-time 120)
+          
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          
+          echo "HTTP Status Code: $HTTP_STATUS"
+          echo "Response Body: $HTTP_BODY"
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ Chu kỳ thu thập dữ liệu đã hoàn tất thành công!"
+            exit 0
+          else
+            echo "❌ Lỗi khi kích hoạt Ingestion hoặc Backend đang khởi động lại (HTTP $HTTP_STATUS)"
+            exit 1
+          fi

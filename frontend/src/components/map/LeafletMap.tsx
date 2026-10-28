@@ -183,8 +183,8 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       maxZoom: 19,
     });
 
-    // Đặt Google Maps làm lớp bản đồ hiển thị mặc định
-    googleRoadLayer.addTo(map);
+    // Đặt CartoDB Voyager làm lớp bản đồ hiển thị mặc định hợp pháp
+    voyagerLayer.addTo(map);
 
     const markersLayer = L.layerGroup().addTo(map);
     markersLayerRef.current = markersLayer;
@@ -198,14 +198,14 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     // Bộ chọn lớp bản đồ nền & lớp phủ sự kiện
     L.control.layers(
       {
-        '🗺️ Google Maps': googleRoadLayer,
-        '🎨 CartoDB Đô thị': voyagerLayer,
-        '🛰️ Google Vệ tinh': googleHybridLayer,
-        '🌍 Esri Vệ tinh': satelliteLayer,
+        '🎨 CartoDB Voyager (Mặc định)': voyagerLayer,
         '📍 OpenStreetMap': osmLayer,
+        '🌍 Esri Vệ tinh': satelliteLayer,
+        '🗺️ Google Maps (Tham khảo)': googleRoadLayer,
+        '🛰️ Google Vệ tinh (Tham khảo)': googleHybridLayer,
       },
       {
-        '🛰️ Trạm Viễn thám Vệ tinh': weatherLayer,
+        '🛰️ Điểm Giám sát Mô hình ECMWF': weatherLayer,
         '📢 Báo cáo Cộng đồng': citizenLayer,
       },
       { position: 'topright' }
@@ -395,33 +395,33 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
             <span class="text-xl">🛰️</span>
             <div>
               <h4 class="font-bold text-xs text-slate-900">${st.name}</h4>
-              <span class="text-[10px] text-cyan-600 font-bold uppercase tracking-wider">Trạm Viễn Thám Vệ Tinh 24/7</span>
+              <span class="text-[10px] text-cyan-600 font-bold uppercase tracking-wider">Điểm Giám Sát Mô Hình ECMWF (NWP)</span>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
               <span class="text-[10px] text-slate-400 block font-medium">Nhiệt độ</span>
-              <span class="font-extrabold text-slate-800 text-sm">${st.weather?.temperature_c || '--'}°C ${st.weather?.weather_icon || ''}</span>
+              <span class="font-extrabold text-slate-800 text-sm">${st.weather?.temperature_c !== undefined ? st.weather.temperature_c : '--'}°C ${st.weather?.weather_icon || ''}</span>
             </div>
             <div class="bg-blue-50/60 p-2 rounded-lg border border-blue-100">
               <span class="text-[10px] text-blue-600 block font-medium">Lượng mưa</span>
-              <span class="font-extrabold text-blue-700 text-sm">${(st.weather?.precipitation_mm_h || 0).toFixed(1)} mm/h</span>
+              <span class="font-extrabold text-blue-700 text-sm">${st.weather?.precipitation_mm_h !== undefined ? st.weather.precipitation_mm_h.toFixed(1) : '--'} mm/h</span>
             </div>
             <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
               <span class="text-[10px] text-slate-400 block font-medium">Độ ẩm</span>
-              <span class="font-bold text-slate-700">${st.weather?.relative_humidity || '--'}%</span>
+              <span class="font-bold text-slate-700">${st.weather?.relative_humidity !== undefined ? st.weather.relative_humidity : '--'}%</span>
             </div>
             <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
               <span class="text-[10px] text-slate-400 block font-medium">Gió</span>
-              <span class="font-bold text-slate-700">${st.weather?.wind_speed_kmh || '--'} km/h</span>
+              <span class="font-bold text-slate-700">${st.weather?.wind_speed_kmh !== undefined ? st.weather.wind_speed_kmh : '--'} km/h</span>
             </div>
           </div>
           <div class="text-[11px] text-slate-600 font-medium">
             Tình trạng: <strong>${st.weather?.weather_description || 'Bình thường'}</strong>
           </div>
           <div class="pt-1.5 border-t border-slate-100 text-[9px] text-slate-400 flex items-center justify-between">
-            <span>Vệ tinh WMO / ECMWF</span>
-            <span class="text-emerald-600 font-bold">● Đang phát trực tiếp</span>
+            <span>Nguồn: Mô hình ECMWF / Open-Meteo</span>
+            <span class="text-emerald-600 font-bold">● Dữ liệu số trị</span>
           </div>
         </div>
       `;

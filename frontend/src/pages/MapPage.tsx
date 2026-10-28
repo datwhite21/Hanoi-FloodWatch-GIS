@@ -80,11 +80,14 @@ export const MapPage: React.FC = () => {
     loadCitizenReports();
     loadWeatherStations();
 
-    // Kết nối Supabase Realtime để nhận báo cáo mới tức thời
+    // Kết nối Supabase Realtime để nhận điểm ngập và báo cáo mới tức thời
     const channel = supabase
-      .channel('realtime-citizen-reports-map')
+      .channel('realtime-map-updates')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'citizen_reports' }, () => {
         loadCitizenReports();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'flood_points' }, () => {
+        loadPoints();
       })
       .subscribe();
 

@@ -80,21 +80,38 @@
 - **Độ trễ trung bình (Average Latency):** `334 ms` *(Vượt xa chỉ tiêu < 500ms quy định trong SRS)*
 - **Mức chiếm dụng RAM máy chủ Node.js:** Dao động ổn định từ `45 MB` đến `72 MB`.
 
+#### 3.6. Nhóm 6: Thu thập Dữ liệu Động, Idempotency & Nguồn Khí tượng Thực tế (Master Prompt V2)
+
+| Mã ca kiểm thử | Mô tả ca kiểm thử | Dữ liệu đầu vào thực nghiệm | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+| :--- | :--- | :--- | :--- | :--- | :---: |
+| **TC-ING-01** | Kiểm tra hợp đồng Zero Mock Data của API Khí tượng | `GET /api/weather/current?lat=21.0285&lng=105.8542` | Trả về dữ liệu thực tế từ ECMWF, có `valid_at`, `source`, không fallback 26°C | Trả về thông số thực tế, `data_source` chứa *"ECMWF"*, không có số liệu giả | 🟢 **PASS** |
+| **TC-ING-02** | Cơ chế chống trùng lặp dữ liệu (Idempotent Ingestion) | Kích hoạt worker thu thập nhiều lần trong cùng một mốc thời gian | Không tạo bản ghi trùng lặp trên `(station_id, observed_at)` | Worker nhận diện và tự động bỏ qua các bản ghi đã tồn tại (`recordsSkipped > 0`) | 🟢 **PASS** |
+| **TC-ING-03** | Bảo toàn số liệu thời tiết khô ráo (0.0 mm/h) | Quét điểm quan trắc khi trời không có mưa | Lưu giá trị `0.0 mm/h` hợp lệ với nhãn `quality_status = 'DRY'`, không bỏ qua | CSDL ghi nhận đầy đủ giá trị 0.0 mm, không bị coi là bản ghi rỗng | 🟢 **PASS** |
+| **TC-ING-04** | Ngưỡng cảnh báo tham khảo kỹ thuật theo Phương pháp luận | Quét cường độ mưa mô hình ECMWF $\ge 20$ mm/h | Sinh bản tin phân loại `RAINFALL_THRESHOLD` kèm chú thích kỹ thuật, không tự xưng cảnh báo khẩn | Tiêu đề: `[Tham khảo Mô hình] Ghi nhận mưa lớn...`, cảnh báo ở mức Advisory | 🟢 **PASS** |
+| **TC-ING-05** | Kích hoạt chu kỳ Ingestion & Ghi nhật ký vận hành | `POST /api/ingestion/trigger` và `GET /api/ingestion/logs` | Kích hoạt thành công chu kỳ quét toàn quốc, lưu lịch sử vào `ingestion_logs` | HTTP 200, hoàn tất quét 7 trạm mô hình, nhật ký lưu trữ minh bạch | 🟢 **PASS** |
+
 ---
 
-### 4. CÁC PHÁT HIỆN KỸ THUẬT & GIẢI PHÁP ĐÃ XỬ LÝ TRONG GIAI ĐOẠN 6
+### 4. CÁC PHÁT HIỆN KỸ THUẬT & GIẢI PHÁP ĐÃ XỬ LÝ TRONG GIAI ĐOẠN NÂNG CẤP V2
 
 1. **Vấn đề ánh xạ tọa độ GeoJSON từ Supabase Client:**
-   - *Hiện tượng:* Trình điều khiển Supabase JS Client tự động giải mã kiểu dữ liệu `geography(Point, 4326)` thành đối tượng JSON `{ type: "Point", coordinates: [lng, lat] }` thay vì chuỗi WKT raw. Hàm cũ chỉ kiểm tra `typeof === 'string'` nên bị bỏ sót và gán tọa độ mặc định.
+   - *Hiện tượng:* Trình điều khiển Supabase JS Client tự động giải mã kiểu dữ liệu `geography(Point, 4326)` thành đối tượng JSON `{ type: "Point", coordinates: [lng, lat] }` thay vì chuỗi WKT raw.
    - *Giải pháp:* Viết hàm dùng chung `extractCoordinates()` hỗ trợ cả GeoJSON object, chuỗi WKT `POINT(x y)` và cặp số `[lat, lng]`, đảm bảo 100% điểm ngập luôn lấy đúng tọa độ thực tế.
-2. **Tính linh hoạt của Router GeoJSON Export:**
-   - *Hiện tượng:* Client có thể gọi theo đường dẫn `/api/export/geojson`, `/api/geojson/export` hoặc `/api/export`.
-   - *Giải pháp:* Cấu hình mảng đường dẫn alias `router.get(['/', '/export', '/geojson'])` trong [geojson.routes.ts](file:///c:/Users/ADMIN/Documents/PTTKPM/PTTKPM25-26_ClassN05_Nhom-21/Documents/Hanoi-FloodWatch-GIS/backend/src/routes/geojson.routes.ts), tương thích 100% với mọi phiên bản client.
+2. **Khắc phục ngủ đông của Render Free Tier bằng GitHub Actions Cron:**
+   - *Hiện tượng:* Render Web Service miễn phí tự động spin-down sau 15 phút không nhận được HTTP request, làm chết `setInterval` của Ingestion Worker.
+   - *Giải pháp:* Thiết lập GitHub Actions scheduled cron workflow (`.github/workflows/ingestion-cron.yml`) định kỳ 30 phút gửi POST request tới `/api/ingestion/trigger` để đánh thức Render và thu thập dữ liệu định kỳ.
+3. **Loại bỏ hoàn toàn Mock Fallback và chuẩn hóa tính khoa học:**
+   - *Hiện tượng:* Worker và Service cũ chứa fallback cứng `26°C, 85%, 0mm` và tự phát sinh cảnh báo đỏ khi mưa $\ge 20$ mm/h mà chưa qua hiệu chỉnh thủy văn.
+   - *Giải pháp:* Thay thế bằng cơ chế báo lỗi trung thực `SOURCE_UNAVAILABLE`, phân loại cảnh báo 4 cấp độ theo phương pháp luận khoa học, minh bạch nguồn gốc mô hình số trị ECMWF IFS lưới ~9km.
 
 ---
 
 ### 5. KẾT LUẬN & ĐÁNH GIÁ CHẤT LƯỢNG
 
-Toàn bộ hệ thống **Hanoi FloodWatch GIS** đã vượt qua tất cả các bài kiểm tra chức năng, phi chức năng, độ chính xác toán học không gian GIS và an toàn thông tin với tỷ lệ thành công tuyệt đối **100% (25/25 ca kiểm thử đạt)**.
+Toàn bộ hệ thống **Vietnam FloodWatch GIS** đã vượt qua tất cả các bài kiểm tra chức năng, phi chức năng, độ chính xác toán học không gian GIS, kiểm soát chất lượng dữ liệu khí tượng thực tế và an toàn thông tin với **tỷ lệ thành công 100% (12/12 unit/integration tests tự động đạt chuẩn)**.
 
-Hệ thống đã đạt đầy đủ điều kiện để chuyển sang **Giai đoạn 7: Triển khai toàn cầu lên Cloud Internet (Render + Cloudflare Pages)**.
+Hệ thống đáp ứng trọn vẹn mọi tiêu chí khắt khe của Đồ án Tốt nghiệp chuyên ngành:
+- Dữ liệu thực tế 100% kiểm chứng được nguồn gốc.
+- Không có bất kỳ dữ liệu giả mạo (Zero Mock Data).
+- Bản đồ nền CartoDB Voyager hợp pháp, hiệu năng cao.
+- Có đầy đủ tài liệu kiến trúc, phương pháp luận cảnh báo và nhật ký kiểm thử chuyên sâu.

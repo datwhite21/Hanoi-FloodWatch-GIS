@@ -8,6 +8,7 @@ import geojsonRouter from './geojson.routes.js';
 import authRouter from './auth.routes.js';
 import weatherRouter from './weather.routes.js';
 import citizenReportsRouter from './citizenReports.routes.js';
+import ingestionRouter from './ingestion.routes.js';
 import { ingestionWorker } from '../workers/ingestion.worker.js';
 
 const apiRouter = Router();
@@ -24,6 +25,7 @@ apiRouter.use('/import', geojsonRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/weather', weatherRouter);
 apiRouter.use('/citizen-reports', citizenReportsRouter);
+apiRouter.use('/ingestion', ingestionRouter);
 
 // Kích hoạt đồng bộ thời tiết vệ tinh thủ công
 apiRouter.post('/weather/sync', async (req, res) => {

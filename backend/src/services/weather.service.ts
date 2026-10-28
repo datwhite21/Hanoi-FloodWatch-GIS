@@ -3,7 +3,7 @@
 // Dịch vụ quan trắc thời tiết & lượng mưa vệ tinh thời gian thực không giới hạn
 // ==============================================================================
 
-interface WeatherResponse {
+export interface WeatherResponse {
   latitude: number;
   longitude: number;
   temperature_c: number;
@@ -15,8 +15,12 @@ interface WeatherResponse {
   weather_description: string;
   weather_icon: string;
   risk_level: 'SAFE' | 'ADVISORY' | 'WARNING' | 'DANGER';
+  valid_at: string;
+  fetched_at: string;
   updated_at: string;
   source: string;
+  data_source?: string;
+  quality_status: 'VALID' | 'DRY';
 }
 
 // Bộ nhớ đệm tạm thời (Cache 5 phút) để giảm thiểu gọi API dư thừa
@@ -58,9 +62,9 @@ function getWeatherDescription(code: number): { desc: string; icon: string } {
 }
 
 function calculateRainRisk(precipitationMmH: number): 'SAFE' | 'ADVISORY' | 'WARNING' | 'DANGER' {
-  if (precipitationMmH >= 50) return 'DANGER';    // > 50mm/h: Báo động ngập lụt khẩn cấp
-  if (precipitationMmH >= 25) return 'WARNING';   // 25 - 50mm/h: Nguy cơ ngập sâu đường phố
-  if (precipitationMmH >= 10) return 'ADVISORY';  // 10 - 25mm/h: Chú ý di chuyển, nước dồn chậm
+  if (precipitationMmH >= 50) return 'DANGER';    // > 50mm/h: Báo động mưa cực đoan
+  if (precipitationMmH >= 25) return 'WARNING';   // 25 - 50mm/h: Mưa rất lớn
+  if (precipitationMmH >= 10) return 'ADVISORY';  // 10 - 25mm/h: Mưa vừa đến to
   return 'SAFE';                                   // < 10mm/h: An toàn
 }
 
@@ -79,7 +83,7 @@ export const weatherService = {
       const res = await fetch(url, { headers: { 'User-Agent': 'Vietnam-FloodWatch-GIS' } });
 
       if (!res.ok) {
-        throw new Error(`Open-Meteo HTTP error: ${res.status}`);
+        throw new Error(`Open-Meteo HTTP ${res.status}`);
       }
 
       const json = (await res.json()) as any;
@@ -88,12 +92,14 @@ export const weatherService = {
       const { desc, icon } = getWeatherDescription(current.weather_code);
       const precip = Number(current.precipitation) || 0;
       const risk = calculateRainRisk(precip);
+      const validAt = current.time ? new Date(current.time).toISOString() : new Date().toISOString();
+      const fetchedAt = new Date().toISOString();
 
       const result: WeatherResponse = {
         latitude: lat,
         longitude: lng,
-        temperature_c: Number(current.temperature_2m) || 25,
-        relative_humidity: Number(current.relative_humidity_2m) || 80,
+        temperature_c: Number(current.temperature_2m) || 0,
+        relative_humidity: Number(current.relative_humidity_2m) || 0,
         precipitation_mm_h: precip,
         rain_mm_h: Number(current.rain) || 0,
         wind_speed_kmh: Number(current.wind_speed_10m) || 0,
@@ -101,31 +107,24 @@ export const weatherService = {
         weather_description: desc,
         weather_icon: icon,
         risk_level: risk,
-        updated_at: current.time ? new Date(current.time).toISOString() : new Date().toISOString(),
-        source: 'Open-Meteo Global Satellite & Radar Feed (WMO/ECMWF)',
+        valid_at: validAt,
+        fetched_at: fetchedAt,
+        updated_at: validAt,
+        source: 'Mô hình Dự báo Số trị ECMWF IFS / Open-Meteo (NWP Grid Model)',
+        data_source: 'Mô hình Dự báo Số trị ECMWF IFS / Open-Meteo (NWP Grid Model)',
+        quality_status: precip === 0 ? 'DRY' : 'VALID',
       };
 
       // Lưu cache 5 phút
       weatherCache.set(cacheKey, { data: result, expiresAt: now + 5 * 60 * 1000 });
       return result;
     } catch (error: any) {
-      console.warn(`[WeatherService] Không thể kết nối Open-Meteo cho (${lat}, ${lng}):`, error.message);
-      // Fallback an toàn nếu mạng ngắt kết nối
-      return {
-        latitude: lat,
-        longitude: lng,
-        temperature_c: 26,
-        relative_humidity: 85,
-        precipitation_mm_h: 0,
-        rain_mm_h: 0,
-        wind_speed_kmh: 5,
-        weather_code: 0,
-        weather_description: 'Trời quang, tạnh ráo',
-        weather_icon: '☀️',
-        risk_level: 'SAFE',
-        updated_at: new Date().toISOString(),
-        source: 'Open-Meteo Offline Fallback',
-      };
+      console.warn(`[WeatherService] Lỗi kết nối Open-Meteo cho (${lat}, ${lng}):`, error.message);
+      // Không trả về dữ liệu giả - ném lỗi rõ ràng theo nguyên tắc Zero Mock Data
+      const err: any = new Error(`Không thể lấy dữ liệu thời tiết thực tế: ${error.message}`);
+      err.statusCode = 502;
+      err.source = 'Open-Meteo';
+      throw err;
     }
   },
 };

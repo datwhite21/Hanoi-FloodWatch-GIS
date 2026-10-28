@@ -111,6 +111,10 @@ export interface LiveWeatherData {
   weather_icon: string;
   risk_level: 'SAFE' | 'ADVISORY' | 'WARNING' | 'DANGER';
   updated_at: string;
+  valid_at?: string;
+  fetched_at?: string;
+  data_source?: string;
+  quality_status?: 'VALID' | 'DRY';
   source: string;
 }
 

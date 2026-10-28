@@ -209,7 +209,7 @@ export const DashboardPage: React.FC = () => {
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Độ chính xác không gian
+                Điểm giám sát mô hình
               </span>
               <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <ShieldCheck className="w-5 h-5" />
@@ -217,13 +217,13 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="mt-4 flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-emerald-600">
-                100%
+                {weatherStations.length}/7
               </span>
               <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                EPSG:4326 PostGIS
+                Điểm kết nối
               </span>
             </div>
-            <p className="mt-2 text-[11px] text-slate-400">Khoảng cách tính theo mét trắc địa WGS 84</p>
+            <p className="mt-2 text-[11px] text-slate-400">Mô hình số trị ECMWF IFS lưới ~9km</p>
           </div>
         </div>
       </section>
@@ -318,13 +318,13 @@ export const DashboardPage: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-                  <span>Mạng Lưới Quan Trắc Vệ Tinh Khí Tượng Thời Gian Thực</span>
+                  <span>Mạng Lưới Điểm Giám Sát Mô Hình Số Trị Khí Tượng ECMWF</span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full uppercase">
-                    ● Trực tiếp 24/7
+                    ● Trực tiếp ECMWF IFS
                   </span>
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Dữ liệu viễn thám lượng mưa (mm/h) và thời tiết tức thời từ Vệ tinh Khí tượng WMO / Open-Meteo
+                  Dữ liệu mô hình dự báo số trị lượng mưa (mm/h) và khí tượng tức thời từ ECMWF / Open-Meteo (Độ phân giải ~9km)
                 </p>
               </div>
             </div>
